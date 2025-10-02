@@ -221,20 +221,27 @@
     }
 
     let allCardsCache = [];
+    let isEditMode = false;
+    let editInputs = [];
 
     window.addEventListener('DOMContentLoaded', () => {
       loadCards();
-      setInterval(loadCards, 10000);
+      let refreshInterval = setInterval(() => {
+        if (!isEditMode) loadCards();
+      }, 10000);
       document.getElementById('searchBar').addEventListener('input', () => {
-        window._searchTrigger = false;
-        loadCards();
+        if (!isEditMode) {
+          window._searchTrigger = false;
+          loadCards();
+        }
       });
-      // Corrige: garantir que o botão existe antes de adicionar o evento
       const btn = document.getElementById('btnSearch');
       if (btn) {
         btn.addEventListener('click', () => {
-          window._searchTrigger = true;
-          loadCards();
+          if (!isEditMode) {
+            window._searchTrigger = true;
+            loadCards();
+          }
         });
       }
     });
@@ -540,8 +547,11 @@
           }
         });
 
-        // Função para ativar edição
+        // Função para ativar edição global
         function ativarEdicaoPedidos() {
+          if (isEditMode) return;
+          isEditMode = true;
+          editInputs = [];
           const tdPedidos = document.querySelectorAll('#dashboard table tbody td[data-card-id]');
           tdPedidos.forEach(tdPedido => {
             const cardId = tdPedido.dataset.cardId;
@@ -555,38 +565,53 @@
             input.style.fontSize = '14px';
             input.style.textAlign = 'center';
             tdPedido.appendChild(input);
-            const btnSalvar = document.createElement('button');
-            btnSalvar.textContent = 'Salvar';
-            btnSalvar.style.marginLeft = '6px';
-            btnSalvar.style.padding = '4px 10px';
-            btnSalvar.style.fontSize = '13px';
-            btnSalvar.style.borderRadius = '6px';
-            btnSalvar.style.border = 'none';
-            btnSalvar.style.background = '#61bd4f';
-            btnSalvar.style.color = '#fff';
-            btnSalvar.style.cursor = 'pointer';
-            btnSalvar.addEventListener('click', async function() {
-              const novoPedido = input.value.trim();
-              btnSalvar.disabled = true;
-              btnSalvar.textContent = 'Salvando...';
-              try {
-                if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
-                const res = await fetch('/update-custom-field', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ cardId, fieldId: idCampoPedido, value: novoPedido })
-                });
-                if (!res.ok) throw new Error('Falha ao atualizar');
-                tdPedido.textContent = novoPedido;
-              } catch (err) {
-                alert('Erro ao salvar: ' + (err.message || err));
-              } finally {
-                btnSalvar.disabled = false;
-                btnSalvar.textContent = 'Salvar';
-              }
-            });
-            tdPedido.appendChild(btnSalvar);
+            editInputs.push({ cardId, input, tdPedido });
           });
+          // Adiciona botão Salvar e Fechar
+          let btnSalvarFechar = document.getElementById('btnSalvarFechar');
+          if (!btnSalvarFechar) {
+            btnSalvarFechar = document.createElement('button');
+            btnSalvarFechar.id = 'btnSalvarFechar';
+            btnSalvarFechar.textContent = 'Salvar e Fechar';
+            btnSalvarFechar.style.margin = '16px 0 8px 20px';
+            btnSalvarFechar.style.padding = '8px 18px';
+            btnSalvarFechar.style.fontSize = '15px';
+            btnSalvarFechar.style.border = 'none';
+            btnSalvarFechar.style.borderRadius = '6px';
+            btnSalvarFechar.style.background = '#61bd4f';
+            btnSalvarFechar.style.color = '#fff';
+            btnSalvarFechar.style.fontWeight = 'bold';
+            btnSalvarFechar.style.cursor = 'pointer';
+            btnSalvarFechar.onclick = async function() {
+              btnSalvarFechar.disabled = true;
+              btnSalvarFechar.textContent = 'Salvando...';
+              let erro = false;
+              for (const { cardId, input, tdPedido } of editInputs) {
+                const novoPedido = input.value.trim();
+                try {
+                  if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
+                  const res = await fetch('/update-custom-field', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cardId, fieldId: idCampoPedido, value: novoPedido })
+                  });
+                  if (!res.ok) throw new Error('Falha ao atualizar');
+                  tdPedido.textContent = novoPedido;
+                } catch (err) {
+                  erro = true;
+                  tdPedido.textContent = 'Erro';
+                }
+              }
+              btnSalvarFechar.disabled = false;
+              btnSalvarFechar.textContent = 'Salvar e Fechar';
+              isEditMode = false;
+              editInputs = [];
+              loadCards();
+              btnSalvarFechar.remove();
+              if (erro) alert('Alguns pedidos não foram salvos.');
+            };
+            btnEditarPedidos.parentNode.insertBefore(btnSalvarFechar, btnEditarPedidos.nextSibling);
+          }
         }
 
         // Evento do botão fora da tabela
