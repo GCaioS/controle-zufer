@@ -249,7 +249,7 @@
         if (campo === 'obs') {
           // Botão para abrir bloco de notas
           const btnObs = document.createElement('button');
-          btnObs.textContent = 'Adicionar Obs';
+          btnObs.textContent = 'Adicionar';
           btnObs.style.padding = '6px 12px';
           btnObs.style.fontSize = '14px';
           btnObs.style.border = 'none';
@@ -342,6 +342,35 @@
               };
             }
           });
+        } else if (campo === 'limite') {
+          let input = document.createElement('input');
+          input.type = 'date';
+          input.style.width = '100%';
+          input.style.padding = '6px';
+          input.style.fontSize = '14px';
+          input.style.boxSizing = 'border-box';
+          input.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+          // Força abrir o calendário ao clicar
+          input.addEventListener('click', function(e) {
+            this.showPicker && this.showPicker();
+          });
+          td.appendChild(input);
+        } else if (campo === 'setor') {
+          const select = document.createElement('select');
+          select.style.width = '100%';
+          select.style.padding = '6px';
+          select.style.fontSize = '14px';
+          select.style.boxSizing = 'border-box';
+          select.style.borderRadius = '6px';
+          select.style.border = '1px solid #ccc';
+          const opcoes = ['', 'PCP', 'Qualidade', 'Produção', 'Diretoria', 'Ferramentaria'];
+          opcoes.forEach(op => {
+            const option = document.createElement('option');
+            option.value = op;
+            option.textContent = op ? op : 'Selecione...';
+            select.appendChild(option);
+          });
+          td.appendChild(select);
         } else {
           let input = document.createElement('input');
           input.type = 'text';
