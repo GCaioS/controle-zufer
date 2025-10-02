@@ -629,63 +629,61 @@
               btnSalvarFechar.disabled = true;
               btnSalvarFechar.textContent = 'Salvando...';
               let erro = false;
+              let erroMsg = '';
               for (const item of editInputs) {
                 const { cardId, input, tdPedido, tdEntregaPed, original, field } = item;
                 let novoValor = input.value.trim();
-                // Só salva se o valor foi alterado
-                if (novoValor === original) {
-                  // Apenas restaura o valor na célula
-                  if (field === 'N° Pedido') {
-                    tdPedido.textContent = original;
-                  } else if (field === 'Entrega Pedido') {
-                    tdEntregaPed.textContent = original;
+                try {
+                  // Só salva se o valor foi alterado
+                  if (novoValor === original) {
+                    // Apenas restaura o valor na célula
+                    if (field === 'N° Pedido') {
+                      tdPedido.textContent = original;
+                    } else if (field === 'Entrega Pedido') {
+                      tdEntregaPed.textContent = original;
+                    }
+                    continue;
                   }
-                  continue;
-                }
-                // Se for campo de data (agora texto), não converte, apenas envia o valor digitado
-                if (field === 'Entrega Pedido') {
-                  let fieldId = idCampoEntrega;
-                  if (!fieldId) throw new Error('Campo "Entrega Pedido" não encontrado');
-                  const res = await fetch('/update-custom-field', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cardId, fieldId, value: novoValor })
-                  });
-                  if (!res.ok) throw new Error('Falha ao atualizar');
-                  tdEntregaPed.textContent = novoValor;
-                  continue;
-                }
-                if (novoValor !== original) {
-                  try {
+                  // Se for campo de data (agora texto), não converte, apenas envia o valor digitado
+                  if (field === 'Entrega Pedido') {
+                    let fieldId = idCampoEntrega;
+                    if (!fieldId) throw new Error('Campo "Entrega Pedido" não encontrado');
+                    const res = await fetch('/update-custom-field', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ cardId, fieldId, value: novoValor })
+                    });
+                    if (!res.ok) {
+                      const errText = await res.text();
+                      throw new Error('Falha ao atualizar: ' + errText);
+                    }
+                    tdEntregaPed.textContent = novoValor;
+                    continue;
+                  }
+                  if (novoValor !== original) {
                     let fieldId = null;
                     if (field === 'N° Pedido') {
                       if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
                       fieldId = idCampoPedido;
-                    } else if (field === 'Entrega Pedido') {
-                      let fieldId = idCampoEntrega;
-                      if (!fieldId) throw new Error('Campo "Entrega Pedido" não encontrado');
-                      // Não converte mais para ISO, pois agora é texto
-                      const res = await fetch('/update-custom-field', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ cardId, fieldId, value: novoValor })
-                      });
-                      if (!res.ok) throw new Error('Falha ao atualizar');
-                      tdEntregaPed.textContent = novoValor;
                     }
-                  } catch (err) {
-                    erro = true;
-                    if (field === 'N° Pedido') {
-                      tdPedido.textContent = 'Erro';
-                    } else if (field === 'Entrega Pedido') {
-                      tdEntregaPed.textContent = 'Erro';
+                    const res = await fetch('/update-custom-field', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ cardId, fieldId, value: novoValor })
+                    });
+                    if (!res.ok) {
+                      const errText = await res.text();
+                      throw new Error('Falha ao atualizar: ' + errText);
                     }
+                    tdPedido.textContent = novoValor;
                   }
-                } else {
+                } catch (err) {
+                  erro = true;
+                  erroMsg += `Erro ao salvar ${field}: ${err.message}\n`;
                   if (field === 'N° Pedido') {
-                    tdPedido.textContent = original;
+                    tdPedido.textContent = 'Erro';
                   } else if (field === 'Entrega Pedido') {
-                    tdEntregaPed.textContent = original;
+                    tdEntregaPed.textContent = 'Erro';
                   }
                 }
               }
@@ -695,7 +693,7 @@
               editInputs = [];
               loadCards();
               btnSalvarFechar.remove();
-              if (erro) alert('Alguns campos não foram salvos.');
+              if (erro) alert(erroMsg || 'Alguns campos não foram salvos.');
             };
             const btnContainer = document.getElementById('btnContainer');
             btnContainer.appendChild(btnSalvarFechar);

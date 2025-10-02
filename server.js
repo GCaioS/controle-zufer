@@ -87,7 +87,11 @@ app.get('/cards/:boardId', async (req, res) => {
 // Endpoint para atualizar campo personalizado do Trello
 app.post('/update-custom-field', async (req, res) => {
   const { cardId, fieldId, value } = req.body;
-  if (!cardId || !fieldId) return res.status(400).json({ error: 'Dados insuficientes' });
+  console.log('Recebido para atualização:', { cardId, fieldId, value });
+  if (!cardId || !fieldId) {
+    console.error('Dados insuficientes:', { cardId, fieldId });
+    return res.status(400).json({ error: 'Dados insuficientes' });
+  }
 
   try {
     // Buscar o boardId do cartão
@@ -101,7 +105,11 @@ app.post('/update-custom-field', async (req, res) => {
       params: { key: TRELLO_KEY, token: TRELLO_TOKEN }
     });
     const customField = customFieldsRes.data.find(f => f.id === fieldId);
-    if (!customField) return res.status(404).json({ error: 'Campo personalizado não encontrado' });
+    if (!customField) {
+      console.error('Campo personalizado não encontrado:', fieldId);
+      return res.status(404).json({ error: 'Campo personalizado não encontrado' });
+    }
+    console.log('Definição do campo personalizado:', customField);
 
     // Monta o body correto conforme o tipo
     let body = {};
@@ -123,8 +131,10 @@ app.post('/update-custom-field', async (req, res) => {
         body = { idValue: value };
         break;
       default:
+        console.error('Tipo de campo não suportado:', customField.type);
         return res.status(400).json({ error: 'Tipo de campo não suportado: ' + customField.type });
     }
+    console.log('Body enviado para Trello:', body);
 
     await axios.put(
       `https://api.trello.com/1/cards/${cardId}/customField/${fieldId}/item`,
