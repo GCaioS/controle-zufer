@@ -346,7 +346,7 @@
           th.style.textAlign = 'center';
           // Adiciona borda à direita, exceto no último th
           if (idx < headersComPedido.length - 1) {
-            th.style.borderRight = '1px solid #e0e0e0';
+            th.style.borderRight = '1px solid #b0b4bb'; // cinza mais escuro
           }
           if (h === 'Status' || h === 'Etiquetas') {
             th.style.maxWidth = '150px';
@@ -410,8 +410,8 @@
           }
 
           function styleCell(td) {
-            td.style.borderLeft = '1px solid #e0e0e0';
-            td.style.borderRight = '1px solid #e0e0e0';
+            td.style.borderLeft = '1px solid #b0b4bb'; // cinza mais escuro
+            td.style.borderRight = '1px solid #b0b4bb'; // cinza mais escuro
             td.style.verticalAlign = 'middle';
             td.style.background = '#fff';
             td.style.paddingLeft = '10px';
