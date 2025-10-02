@@ -11,9 +11,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 const fs = require('fs');
 const { TRELLO_KEY, TRELLO_TOKEN, PORT } = process.env;
+
+// Endpoint para listar todos os registros da ferramentaria
+app.get('/api/ferramentaria', (req, res) => {
+  const filePath = path.join(__dirname, 'data', 'ferramentaria.json');
+  let registros = [];
+  if (fs.existsSync(filePath)) {
+    try {
+      registros = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (e) {
+      registros = [];
+    }
+  }
+  res.json(registros);
+});
 // Endpoint para salvar dados da ferramentaria
 app.post('/api/ferramentaria', (req, res) => {
   const novoRegistro = req.body;
