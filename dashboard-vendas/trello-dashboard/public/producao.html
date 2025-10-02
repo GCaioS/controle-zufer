@@ -166,13 +166,13 @@
       flex-direction: column;
       gap: 4px;
       word-break: break-word;
-      max-height: 100px;
-      overflow: hidden;
+      max-height: unset;
+      overflow: unset;
     }
     .card-title {
       font-weight: bold;
       color: #172b4d;
-      font-size: 13px;
+      font-size: 17px;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       overflow: hidden;
@@ -308,12 +308,21 @@
               titleDiv.textContent = escapeHtml(card.name);
               cardDiv.appendChild(titleDiv);
 
-              const descDiv = document.createElement('div');
-              descDiv.className = 'card-desc';
-              descDiv.textContent = escapeHtml(card.desc || '');
-              cardDiv.appendChild(descDiv);
-
               const labelsContainer = document.createElement('div');
+                      // Exibe campos personalizados
+                      if (card.customFields && Object.keys(card.customFields).length > 0) {
+                        const customFieldsDiv = document.createElement('div');
+                        customFieldsDiv.style.fontSize = '10px';
+                        customFieldsDiv.style.color = '#333';
+                        customFieldsDiv.style.marginTop = '2px';
+                        customFieldsDiv.style.wordBreak = 'break-word';
+                        for (const [key, value] of Object.entries(card.customFields)) {
+                          const fieldDiv = document.createElement('div');
+                          fieldDiv.textContent = `${key}: ${value ?? ''}`;
+                          customFieldsDiv.appendChild(fieldDiv);
+                        }
+                        cardDiv.appendChild(customFieldsDiv);
+                      }
               labelsContainer.className = 'labels';
               (card.labels || []).forEach(l => {
                 const span = document.createElement('span');
