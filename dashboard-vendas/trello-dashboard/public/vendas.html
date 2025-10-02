@@ -547,6 +547,7 @@
           tdEntregaPed.style.minWidth = '60px';
           styleCell(tdEntregaPed);
           tdEntregaPed.style.paddingLeft = '0';
+          tdEntregaPed.dataset.entregaCardId = card.id;
           tr.appendChild(tdEntregaPed);
 
           tbody.appendChild(tr);
@@ -576,7 +577,23 @@
             input.style.fontSize = '14px';
             input.style.textAlign = 'center';
             tdPedido.appendChild(input);
-            editInputs.push({ cardId, input, tdPedido, original: pedidoAtual });
+            editInputs.push({ cardId, input, tdPedido, original: pedidoAtual, field: 'N° Pedido' });
+          });
+          // Editar Entrega Ped.
+          const tdEntregas = document.querySelectorAll('#dashboard table tbody td[data-entrega-card-id]');
+          tdEntregas.forEach(tdEntregaPed => {
+            const cardId = tdEntregaPed.dataset.entregaCardId;
+            const entregaAtual = tdEntregaPed.textContent;
+            tdEntregaPed.innerHTML = '';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = entregaAtual;
+            input.style.width = '80px';
+            input.style.padding = '4px';
+            input.style.fontSize = '14px';
+            input.style.textAlign = 'center';
+            tdEntregaPed.appendChild(input);
+            editInputs.push({ cardId, input, tdEntregaPed, original: entregaAtual, field: 'Entrega Pedido' });
           });
           // Adiciona botão Salvar e Fechar
           let btnSalvarFechar = document.getElementById('btnSalvarFechar');
@@ -598,24 +615,55 @@
               btnSalvarFechar.disabled = true;
               btnSalvarFechar.textContent = 'Salvando...';
               let erro = false;
-              for (const { cardId, input, tdPedido, original } of editInputs) {
-                const novoPedido = input.value.trim();
-                if (novoPedido !== original) {
+              for (const item of editInputs) {
+                const { cardId, input, tdPedido, tdEntregaPed, original, field } = item;
+                const novoValor = input.value.trim();
+                if (novoValor !== original) {
                   try {
-                    if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
+                    let fieldId = null;
+                    if (field === 'N° Pedido') {
+                      if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
+                      fieldId = idCampoPedido;
+                    } else if (field === 'Entrega Pedido') {
+                      // Descobre o id do campo personalizado 'Entrega Pedido'
+                      if (allCardsCache.length > 0 && allCardsCache[0].customFields) {
+                        for (const key in allCardsCache[0].customFields) {
+                          if (key.toLowerCase().includes('entrega')) {
+                            const customFieldItem = (allCardsCache[0].customFieldItems || []).find(i => i.value?.text === allCardsCache[0].customFields[key] || i.value?.number === allCardsCache[0].customFields[key]);
+                            if (customFieldItem) {
+                              fieldId = customFieldItem.idCustomField;
+                              break;
+                            }
+                          }
+                        }
+                      }
+                      if (!fieldId) throw new Error('Campo "Entrega Pedido" não encontrado');
+                    }
                     const res = await fetch('/update-custom-field', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ cardId, fieldId: idCampoPedido, value: novoPedido })
+                      body: JSON.stringify({ cardId, fieldId, value: novoValor })
                     });
                     if (!res.ok) throw new Error('Falha ao atualizar');
-                    tdPedido.textContent = novoPedido;
+                    if (field === 'N° Pedido') {
+                      tdPedido.textContent = novoValor;
+                    } else if (field === 'Entrega Pedido') {
+                      tdEntregaPed.textContent = novoValor;
+                    }
                   } catch (err) {
                     erro = true;
-                    tdPedido.textContent = 'Erro';
+                    if (field === 'N° Pedido') {
+                      tdPedido.textContent = 'Erro';
+                    } else if (field === 'Entrega Pedido') {
+                      tdEntregaPed.textContent = 'Erro';
+                    }
                   }
                 } else {
-                  tdPedido.textContent = original;
+                  if (field === 'N° Pedido') {
+                    tdPedido.textContent = original;
+                  } else if (field === 'Entrega Pedido') {
+                    tdEntregaPed.textContent = original;
+                  }
                 }
               }
               btnSalvarFechar.disabled = false;
@@ -624,7 +672,7 @@
               editInputs = [];
               loadCards();
               btnSalvarFechar.remove();
-              if (erro) alert('Alguns pedidos não foram salvos.');
+              if (erro) alert('Alguns campos não foram salvos.');
             };
             const btnContainer = document.getElementById('btnContainer');
             btnContainer.appendChild(btnSalvarFechar);
