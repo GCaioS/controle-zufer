@@ -565,7 +565,7 @@
             input.style.fontSize = '14px';
             input.style.textAlign = 'center';
             tdPedido.appendChild(input);
-            editInputs.push({ cardId, input, tdPedido });
+            editInputs.push({ cardId, input, tdPedido, original: pedidoAtual });
           });
           // Adiciona botão Salvar e Fechar
           let btnSalvarFechar = document.getElementById('btnSalvarFechar');
@@ -586,20 +586,24 @@
               btnSalvarFechar.disabled = true;
               btnSalvarFechar.textContent = 'Salvando...';
               let erro = false;
-              for (const { cardId, input, tdPedido } of editInputs) {
+              for (const { cardId, input, tdPedido, original } of editInputs) {
                 const novoPedido = input.value.trim();
-                try {
-                  if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
-                  const res = await fetch('/update-custom-field', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cardId, fieldId: idCampoPedido, value: novoPedido })
-                  });
-                  if (!res.ok) throw new Error('Falha ao atualizar');
-                  tdPedido.textContent = novoPedido;
-                } catch (err) {
-                  erro = true;
-                  tdPedido.textContent = 'Erro';
+                if (novoPedido !== original) {
+                  try {
+                    if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
+                    const res = await fetch('/update-custom-field', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ cardId, fieldId: idCampoPedido, value: novoPedido })
+                    });
+                    if (!res.ok) throw new Error('Falha ao atualizar');
+                    tdPedido.textContent = novoPedido;
+                  } catch (err) {
+                    erro = true;
+                    tdPedido.textContent = 'Erro';
+                  }
+                } else {
+                  tdPedido.textContent = original;
                 }
               }
               btnSalvarFechar.disabled = false;
