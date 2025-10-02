@@ -12,6 +12,9 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px 24px;
+      background: #e9f3fa;
+      border-radius: 6px;
+      padding: 8px 10px;
     }
 
     .campos-destaque {
@@ -373,6 +376,7 @@
               if (card.customFields && Object.keys(card.customFields).length > 0) {
                 const customFieldsDiv = document.createElement('div');
                 customFieldsDiv.className = 'campos-personalizados';
+                customFieldsDiv.style.marginTop = '25px';
                 // Ordem e agrupamento dos campos (exceto OP e Ciclo)
                 const camposOrdem = [
                   ['Molde', 'Material'],
