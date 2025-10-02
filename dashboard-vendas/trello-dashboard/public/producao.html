@@ -323,7 +323,24 @@
                 cardDiv.appendChild(statusDiv);
               }
 
-              // Exibe etiquetas acima do título
+              // Exibe OP e Ciclo acima das etiquetas
+              if (card.customFields) {
+                const topFieldsDiv = document.createElement('div');
+                topFieldsDiv.className = 'campos-personalizados';
+                topFieldsDiv.style.marginBottom = '25px';
+                ['OP', 'Ciclo'].forEach(campo => {
+                  const fieldDiv = document.createElement('div');
+                  let valor = card.customFields[campo];
+                  if (valor && typeof valor === 'string' && valor.length > 18) {
+                    valor = valor.substring(0, 15) + '...';
+                  }
+                  fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
+                  topFieldsDiv.appendChild(fieldDiv);
+                });
+                cardDiv.appendChild(topFieldsDiv);
+              }
+
+              // Exibe etiquetas
               const labelsDiv = document.createElement('div');
               labelsDiv.className = 'labels';
               (card.labels || []).forEach(l => {
@@ -340,17 +357,15 @@
               titleDiv.textContent = escapeHtml(card.name);
               cardDiv.appendChild(titleDiv);
 
-
-              // Exibe campos personalizados
+              // Exibe os demais campos personalizados
               if (card.customFields && Object.keys(card.customFields).length > 0) {
                 const customFieldsDiv = document.createElement('div');
                 customFieldsDiv.className = 'campos-personalizados';
-                // Ordem e agrupamento dos campos
+                // Ordem e agrupamento dos campos (exceto OP e Ciclo)
                 const camposOrdem = [
-                  ['OP', 'Molde'],
-                  ['Material', 'Cor'],
-                  ['Quantidade', 'Produção'],
-                  ['N° Pedido', 'Ciclo']
+                  ['Molde', 'Material'],
+                  ['Cor', 'Quantidade'],
+                  ['Produção', 'N° Pedido']
                 ];
                 camposOrdem.forEach(par => {
                   par.forEach(campo => {
