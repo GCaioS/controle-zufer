@@ -244,6 +244,14 @@
         const res = await fetch(`/cards/${boardId}`);
         if (!res.ok) throw new Error('Erro ao carregar cards');
         let cards = await res.json();
+        // Ordena: status 'Em andamento' primeiro
+        cards.sort((a, b) => {
+          function isEmAndamento(card) {
+            if (!Array.isArray(card.labels)) return false;
+            return card.labels.some(l => l.name && l.name.trim().toLowerCase() === 'em andamento');
+          }
+          return (isEmAndamento(b) ? 1 : 0) - (isEmAndamento(a) ? 1 : 0);
+        });
         allCardsCache = cards;
 
         // Busca: apenas destaca, não filtra
