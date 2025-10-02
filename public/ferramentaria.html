@@ -239,31 +239,107 @@
           return;
         }
         const dados = Array.from(primeiraLinha.children).map(td => td.innerText);
-        // Monta layout simples de ordem de produção
+        // Novo layout fornecido pelo usuário
         const html = `
-          <html><head><title>Ordem de Produção</title>
-          <style>
-            body{font-family:Arial,sans-serif;padding:32px;}
-            h2{margin-bottom:18px;}
-            .ordem{border:1px solid #ccc;border-radius:12px;padding:24px;max-width:500px;}
-            .campo{margin-bottom:12px;}
-            .label{font-weight:bold;display:inline-block;width:160px;}
-          </style>
-          </head><body>
-            <h2>Ordem de Produção</h2>
-            <div class="ordem">
-              <div class="campo"><span class="label">N° OS:</span> ${dados[0] || ''}</div>
-              <div class="campo"><span class="label">Data Abertura:</span> ${dados[1] || ''}</div>
-              <div class="campo"><span class="label">Cod. Peça:</span> ${dados[2] || ''}</div>
-              <div class="campo"><span class="label">N° Molde:</span> ${dados[3] || ''}</div>
-              <div class="campo"><span class="label">Setor Solicitante:</span> ${dados[5] || ''}</div>
-              <div class="campo"><span class="label">Data Limite Entrega:</span> ${dados[6] || ''}</div>
-              <div class="campo"><span class="label">Status:</span> ${dados[7] || ''}</div>
-              <div class="campo"><span class="label">Observação:</span><br><pre style="white-space:pre-wrap;font-size:14px;">${dados[4] || ''}</pre></div>
-            </div>
-          </body></html>
+<html>
+<head>
+  <title>Ordem de Serviço Manutenção</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 12px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #000; padding: 4px 6px; font-size: 13px; vertical-align: middle; }
+    .titulo { text-align: center; font-size: 18px; font-weight: bold; }
+    .cabecalho td { height: 30px; }
+    .classe-tipo-table { width: 65%; margin-top: 12px; }
+    .classe-tipo-table th, .classe-tipo-table td { text-align: left; }
+    .tick { width: 16px; height: 16px; display: inline-block; border: 1px solid #000; }
+    .obs { border: 1px solid #000; height: 280px; margin-top: 12px; padding: 8px; font-size: 13px; }
+    .assinaturas { margin-top: 12px; width: 100%; }
+    .assinaturas td { height: 36px; padding: 8px; }
+    .data-criacao-block { width: 30%; float: right; margin-top: 12px; }
+    .clear { clear: both; }
+  </style>
+</head>
+<body>
+  <!-- CABEÇALHO -->
+  <table class="cabecalho">
+    <tr>
+      <td style="width: 80px;">Logo:</td>
+      <td class="titulo" colspan="3">Ordem de Serviço Manutenção</td>
+      <td style="width: 80px;">OP:</td>
+    </tr>
+    <tr>
+      <td colspan="2">Solicitante:</td>
+      <td style="width: 25%;">Código Produto:</td>
+      <td style="width: 35%;">Descrição:</td>
+      <td></td>
+    </tr>
+  </table>
+
+  <!-- CLASSE e TIPO lado a lado, com espaçamento e título ocupando duas colunas -->
+  <div style="display: flex; gap: 32px; margin-top: 12px;">
+    <table style="width: 40%; border-collapse: collapse;">
+      <tr>
+        <th colspan="2" style="text-align: center;">Classe</th>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Elétrica</td>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Mecânica</td>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Hidráulica</td>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Pneumática</td>
+      </tr>
+    </table>
+    <table style="width: 40%; border-collapse: collapse;">
+      <tr>
+        <th colspan="2" style="text-align: center;">Tipo</th>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Corretiva</td>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Preventiva</td>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Predial</td>
+      </tr>
+      <tr>
+        <td style="width:28px;text-align:center;"><span class="tick"></span></td><td></td>
+      </tr>
+    </table>
+    <div class="data-criacao-block" style="width: 20%;">
+      <table style="width: 100%;">
+        <tr><td>Data de Criação:</td></tr>
+        <tr><td>${dados[1] || ''}</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="clear"></div>
+
+  <!-- OBSERVAÇÃO -->
+  <div class="obs">
+    <b>Observação:</b><br><br>
+    ${dados[4] || ''}
+  </div>
+
+  <!-- RODAPÉ: Molde / Responsável / Início / Fim -->
+  <table class="assinaturas">
+    <tr>
+      <td style="width: 25%;">Molde: ${dados[3] || ''}</td>
+      <td style="width: 30%;">Responsável: __________________</td>
+      <td style="width: 20%;">Início da Manutenção: ___/___/____</td>
+      <td style="width: 25%;">Fim da Manutenção: ___/___/____</td>
+    </tr>
+  </table>
+</body>
+</html>
         `;
-        const win = window.open('', '', 'width=700,height=600');
+        const win = window.open('', '', 'width=900,height=700');
         win.document.write(html);
         win.document.close();
         win.print();
