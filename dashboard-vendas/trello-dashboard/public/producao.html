@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <title>Dashboard Trello Estilizado</title>
   <style>
+    /* Animação para cartão piscando em vermelho claro */
+    @keyframes blink-red {
+      0% { background: #ff4d4d; }
+      50% { background: #fff0f0; }
+      100% { background: #ff4d4d; }
+    }
+    .card-blink-red {
+      animation: blink-red 0.8s infinite;
+      box-shadow: 0 0 16px 2px #ff4d4d;
+    }
     .campos-personalizados {
       font-size: 14px;
       color: #333;
@@ -517,6 +527,7 @@
               if (diffDias === 0) {
                 corFundoFim = '#ffd6d6';
                 fimSpan.style.border = '2px solid #e57373';
+                cardDiv.classList.add('card-blink-red');
               } else if (diffDias === 1) {
                 corFundoFim = '#fff9c4';
                 fimSpan.style.border = '2px solid #ffe082';
@@ -678,6 +689,7 @@
           if (diffDias === 0) {
             corFundoFim = '#ffd6d6';
             fimSpan.style.border = '2px solid #e57373';
+            cardDiv.classList.add('card-blink-red');
           } else if (diffDias === 1) {
             corFundoFim = '#fff9c4';
             fimSpan.style.border = '2px solid #ffe082';
