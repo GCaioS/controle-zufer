@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Trello Estilizado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f5f7;
+      margin: 0;
+      font-size: 13px;
+      display: flex;
+    }
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      background: #fff;
+      color: #222e3c;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0 0 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+      z-index: 10;
+      transition: width 0.3s;
+      overflow: hidden;
+    }
+    .sidebar.closed {
+      width: 60px;
+    }
+    .sidebar .logo {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 24px;
+      transition: all 0.3s;
+    }
+    .sidebar .logo img {
+      width: 140px;
+      transition: width 0.3s, opacity 0.3s;
+    }
+    .sidebar.closed .logo img {
+      display: none;
+    }
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-left: 24px;
+      transition: all 0.3s;
+    }
+    .sidebar a {
+      color: #222e3c;
+      text-decoration: none;
+      font-size: 15px;
+      padding: 6px 0;
+      border-radius: 4px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .sidebar a:hover {
+      background: #f4f5f7;
+    }
+    .sidebar a img {
+      width: 18px;
+      height: 18px;
+      margin-right: 12px;
+      filter: grayscale(100%);
+      transition: margin 0.3s, width 0.3s, height 0.3s;
+    }
+    .sidebar.closed nav {
+      margin-left: 0;
+      align-items: center;
+    }
+    .sidebar.closed nav a {
+      justify-content: center;
+      font-size: 0;
+      padding: 8px 0;
+    }
+    .sidebar.closed nav a img {
+      margin: 0;
+      width: 24px;
+      height: 24px;
+      filter: grayscale(0%);
+    }
+    .sidebar-toggle {
+      margin-top: auto;
+      width: 100%;
+      background: none;
+      border: none;
+      color: #222e3c;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      position: absolute;
+      left: 0;
+      bottom: 32px;
+      border-radius: 0 0 0 8px;
+    }
+    .sidebar-toggle:hover {
+      background: #f4f5f7;
+    }
+    .sidebar.closed .sidebar-toggle {
+      width: 60px;
+    }
+    .main-content {
+      margin-left: 220px;
+      width: calc(100vw - 220px);
+      padding: 20px;
+      transition: margin-left 0.3s, width 0.3s;
+    }
+    .sidebar.closed ~ .main-content {
+      margin-left: 60px;
+      width: calc(100vw - 60px);
+    }
+    /* ...estilos originais da página... */
+    h2 {
+      margin-bottom: 10px;
+      margin-left: 20px;
+      font-size: 18px;
+      text-align: left;
+    }
+    #dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .dashboard-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .lista {
+      flex: 1 1 calc(100% / 5 - 12px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #ebecf0;
+      padding: 8px;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .dashboard-row:nth-child(5) .lista {
+      flex: 1 1 calc(100% / 2 - 12px);
+    }
+    .lista-titulo {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .card {
+      flex: 1 1 auto;
+      padding: 6px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      word-break: break-word;
+      max-height: 100px;
+      overflow: hidden;
+    }
+    .card-title {
+      font-weight: bold;
+      color: #172b4d;
+      font-size: 13px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-desc {
+      font-size: 10px;
+      color: #5e6c84;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .labels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px;
+    }
+    .label {
+      padding: 1px 3px;
+      border-radius: 4px;
+      font-size: 9px;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <img src="./logo.png" alt="Logo">
+    </div>
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 0 24px 18px 24px;">
+    <nav>
+      <a href="./index.html">
+        <img src="./icons/house-chimney.svg" alt="Dashboard">
+        <span>Início</span>
+      </a>
+      <a href="./producao.html" id="producaoLink">
+        <img src="./icons/industry-windows.svg" alt="Dashboard">
+        <span>Painel Fabrica</span>
+      </a>
+      <a href="./vendas.html" id="vendasLink">
+        <img src="./icons/search-dollar.svg" alt="Relatórios">
+        <span>Vendas</span>
+      </a>
+    </nav>
+    <button class="sidebar-toggle" id="sidebarToggle" title="Abrir/Fechar menu">
+      <span id="toggleIcon">&lt;</span>
+    </button>
+  </div>
+  <div class="main-content" id="mainContent">
+  <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 10px; justify-content: space-between; position: relative;">
+    <img src="logo.png" alt="Logo" style="height: 58px; margin-right: 18px; margin-left: 0;" />
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <input id="searchBar" type="text" placeholder="Pesquisar código ou descrição..." style="padding: 8px 14px; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; width: 240px;" autocomplete="off">
+      <div id="suggestions" style="position: absolute; z-index: 10; background: #fff; border: 1px solid #ccc; border-radius: 0 0 6px 6px; width: 240px; max-height: 180px; overflow-y: auto; display: none;"></div>
+      <button id="btnSearch" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #0079bf; color: #fff; font-weight: bold; cursor: pointer; margin-right: 8px;">Buscar</button>
+    </div>
+  </div>
+  <h2 style="margin-top: 30px">Sequência de Máquinas</h2>
+  <div id="dashboard" style="margin-top: 30px"></div>
+
+  <script>
+    const labelColors = {
+      green: '#61bd4f', yellow: '#f2d600', orange: '#ff9f1a', red: '#eb5a46',
+      purple: '#c377e0', blue: '#0079bf', sky: '#00c2e0', lime: '#51e898',
+      pink: '#ff78cb', black: '#344563'
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCards();
+      setInterval(loadCards, 10000);
+    });
+
+    async function loadCards() {
+      const boardId = 'eBApBIzf';
+
+      try {
+        const res = await fetch(`/cards/${boardId}`);
+        if (!res.ok) throw new Error('Erro ao carregar cards');
+        const cards = await res.json();
+
+        const dashboard = document.getElementById('dashboard');
+        dashboard.innerHTML = '';
+
+        // Agrupa cards por lista
+        const listasMap = {};
+        cards.forEach(card => {
+          if (!listasMap[card.listName]) listasMap[card.listName] = [];
+          listasMap[card.listName].push(card);
+        });
+
+        // Ordena listas de INJ 1 a INJ 22
+        const sortedListNames = Object.keys(listasMap)
+          .sort((a,b) => parseInt(a.replace(/\D/g,''),10) - parseInt(b.replace(/\D/g,''),10));
+
+        // Layout: quantidade de listas por linha
+        const layout = [5,5,5,5,2];
+        let index = 0;
+
+        layout.forEach(count => {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'dashboard-row';
+
+          for(let i=0; i<count; i++){
+            if(index >= sortedListNames.length) break;
+            const listName = sortedListNames[index];
+            const listaDiv = document.createElement('div');
+            listaDiv.className = 'lista';
+
+            const titulo = document.createElement('div');
+            titulo.className = 'lista-titulo';
+            titulo.textContent = listName;
+            listaDiv.appendChild(titulo);
+
+            listasMap[listName].forEach(card => {
+              const cardDiv = document.createElement('div');
+              cardDiv.className = 'card';
+
+              const titleDiv = document.createElement('div');
+              titleDiv.className = 'card-title';
+              titleDiv.textContent = escapeHtml(card.name);
+              cardDiv.appendChild(titleDiv);
+
+              const descDiv = document.createElement('div');
+              descDiv.className = 'card-desc';
+              descDiv.textContent = escapeHtml(card.desc || '');
+              cardDiv.appendChild(descDiv);
+
+              const labelsContainer = document.createElement('div');
+              labelsContainer.className = 'labels';
+              (card.labels || []).forEach(l => {
+                const span = document.createElement('span');
+                span.className = 'label';
+                span.textContent = l.name || '';
+                span.style.backgroundColor = labelColors[l.color] || '#888';
+                labelsContainer.appendChild(span);
+              });
+              cardDiv.appendChild(labelsContainer);
+
+              listaDiv.appendChild(cardDiv);
+            });
+
+            rowDiv.appendChild(listaDiv);
+            index++;
+          }
+
+          dashboard.appendChild(rowDiv);
+        });
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro: ' + (err.message || err));
+      }
+    }
+
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('closed');
+      toggleIcon.innerHTML = sidebar.classList.contains('closed') ? '&gt;' : '&lt;';
+    });
+  </script>
+</body>
+</html>

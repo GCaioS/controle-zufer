@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Relação Vendas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f5f7;
+      margin: 0;
+      font-size: 13px;
+      display: flex;
+    }
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      background: #fff;
+      color: #222e3c;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0 0 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+      z-index: 10;
+      transition: width 0.3s;
+      overflow: hidden;
+    }
+    .sidebar.closed {
+      width: 60px;
+    }
+    .sidebar .logo {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 24px;
+      transition: all 0.3s;
+    }
+    .sidebar .logo img {
+      width: 140px;
+      transition: width 0.3s, opacity 0.3s;
+    }
+    .sidebar.closed .logo img {
+      display: none;
+    }
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-left: 24px;
+      transition: all 0.3s;
+    }
+    .sidebar a {
+      color: #222e3c;
+      text-decoration: none;
+      font-size: 15px;
+      padding: 6px 0;
+      border-radius: 4px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .sidebar a:hover {
+      background: #f4f5f7;
+    }
+    .sidebar a img {
+      width: 18px;
+      height: 18px;
+      margin-right: 12px;
+      filter: grayscale(100%);
+      transition: margin 0.3s, width 0.3s, height 0.3s;
+    }
+    .sidebar.closed nav {
+      margin-left: 0;
+      align-items: center;
+    }
+    .sidebar.closed nav a {
+      justify-content: center;
+      font-size: 0;
+      padding: 8px 0;
+    }
+    .sidebar.closed nav a img {
+      margin: 0;
+      width: 24px;
+      height: 24px;
+      filter: grayscale(0%);
+    }
+    .sidebar-toggle {
+      margin-top: auto;
+      width: 100%;
+      background: none;
+      border: none;
+      color: #222e3c;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      position: absolute;
+      left: 0;
+      bottom: 32px;
+      border-radius: 0 0 0 8px;
+    }
+    .sidebar-toggle:hover {
+      background: #f4f5f7;
+    }
+    .sidebar.closed .sidebar-toggle {
+      width: 60px;
+    }
+    .main-content {
+      margin-left: 220px;
+      width: calc(100vw - 220px);
+      padding: 20px;
+      transition: margin-left 0.3s, width 0.3s;
+    }
+    .sidebar.closed ~ .main-content {
+      margin-left: 60px;
+      width: calc(100vw - 60px);
+    }
+    /* ...estilos originais da página... */
+    .highlight td {
+      background-color: #ffe066 !important;
+    }
+    h2 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    #dashboard {
+      margin-top: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .dashboard-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 100vw;
+      box-sizing: border-box;
+      justify-items: stretch;
+      margin-left: 5%;
+    }
+    .dashboard-row.setups-row {
+      display: none !important;
+    }
+    .lista {
+      background: #ebecf0;
+      border-radius: 8px;
+      padding: 6px;
+      min-width: 200px;
+      max-width: 240px;
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <img src="./logo.png" alt="Logo">
+    </div>
+    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 0 24px 18px 24px;">
+    <nav>
+      <a href="./index.html">
+        <img src="./icons/house-chimney.svg" alt="Dashboard">
+        <span>Início</span>
+      </a>
+      <a href="./producao.html" id="producaoLink">
+        <img src="./icons/industry-windows.svg" alt="Dashboard">
+        <span>Painel Fabrica</span>
+      </a>
+      <a href="./vendas.html" id="vendasLink">
+        <img src="./icons/search-dollar.svg" alt="Relatórios">
+        <span>Vendas</span>
+      </a>
+    </nav>
+    <button class="sidebar-toggle" id="sidebarToggle" title="Abrir/Fechar menu">
+      <span id="toggleIcon">&lt;</span>
+    </button>
+  </div>
+  <div class="main-content" id="mainContent">
+
+  <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 10px; justify-content: space-between; position: relative;">
+    <img src="logo.png" alt="Logo" style="height: 58px; margin-right: 18px; margin-left: 0;" />
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <input id="searchBar" type="text" placeholder="Pesquisar código ou descrição..." style="padding: 8px 14px; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; width: 240px;" autocomplete="off">
+      <div id="suggestions" style="position: absolute; z-index: 10; background: #fff; border: 1px solid #ccc; border-radius: 0 0 6px 6px; width: 240px; max-height: 180px; overflow-y: auto; display: none;"></div>
+      <button id="btnSearch" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #0079bf; color: #fff; font-weight: bold; cursor: pointer; margin-right: 8px;">Buscar</button>
+    </div>
+  </div>
+  <h2 style="margin-top: 30px; margin-left: 20px;">Acompanhamento de Pedidos</h2>
+  <div id="dashboard"></div>
+<body>
+
+
+  <script>
+    const labelColors = {
+      green: '#61bd4f', yellow: '#f2d600', orange: '#ff9f1a', red: '#eb5a46',
+      purple: '#c377e0', blue: '#0079bf', sky: '#00c2e0', lime: '#51e898',
+      pink: '#ff78cb', black: '#344563'
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    let allCardsCache = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCards();
+      setInterval(loadCards, 10000);
+      document.getElementById('searchBar').addEventListener('input', () => {
+        window._searchTrigger = false;
+        loadCards();
+      });
+      // Corrige: garantir que o botão existe antes de adicionar o evento
+      const btn = document.getElementById('btnSearch');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          window._searchTrigger = true;
+          loadCards();
+        });
+      }
+    });
+
+    async function loadCards() {
+      const boardId = 'eBApBIzf';
+      try {
+        const res = await fetch(`/cards/${boardId}`);
+        if (!res.ok) throw new Error('Erro ao carregar cards');
+        let cards = await res.json();
+        allCardsCache = cards;
+
+        // Busca: apenas destaca, não filtra
+        const searchValue = (document.getElementById('searchBar')?.value || '').toLowerCase();
+        let highlightIndex = -1;
+        if (window._searchTrigger) {
+          highlightIndex = cards.findIndex(card => {
+            let codigo = '';
+            let descricao = '';
+            if (card.name) {
+              const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
+              if (match) {
+                codigo = match[1].trim();
+                descricao = match[2].trim();
+              } else {
+                codigo = card.name;
+                descricao = '';
+              }
+            }
+            return (
+              (codigo && codigo.toLowerCase().includes(searchValue)) ||
+              (descricao && descricao.toLowerCase().includes(searchValue))
+            );
+          });
+          window._searchTrigger = false;
+        }
+
+        const dashboard = document.getElementById('dashboard');
+        dashboard.innerHTML = '';
+
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.maxWidth = '1100px';
+        table.style.margin = '0 auto';
+        table.style.background = '#fff';
+        table.style.borderCollapse = 'collapse';
+        table.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
+        table.style.borderRadius = '0';
+        table.style.overflow = 'hidden';
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        const headersComPedido = ['N° Pedido', 'Código', 'Descrição', 'Status', 'Fim Inj.', 'Entrega Ped.'];
+        headersComPedido.forEach(h => {
+          const th = document.createElement('th');
+          th.textContent = h;
+          th.style.padding = '10px 8px';
+          th.style.background = '#f4f5f7';
+          th.style.fontWeight = 'bold';
+          th.style.fontSize = '15px';
+          th.style.color = '#222';
+          th.style.borderBottom = '1px solid #e0e0e0';
+          th.style.textAlign = 'center';
+          if (h === 'Status' || h === 'Etiquetas') {
+            th.style.maxWidth = '150px';
+            th.style.width = '150px';
+            th.style.minWidth = '80px';
+          }
+          if (h === 'N° Pedido' || h === 'Código') {
+            th.style.maxWidth = '110px';
+            th.style.width = '110px';
+            th.style.minWidth = '80px';
+          }
+          if (h === 'Entrega' || h === 'Fim Inj.' || h === 'Entrega Ped.') {
+            th.style.maxWidth = '80px';
+            th.style.width = '80px';
+            th.style.minWidth = '60px';
+          }
+          if (h === 'Descrição') {
+            th.style.maxWidth = '400px';
+            th.style.width = '400px';
+            th.style.minWidth = '200px';
+          }
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        cards.forEach((card, i) => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid #f0f0f0';
+          tr.style.height = '30px';
+          tr.style.marginBottom = '6px';
+          tr.style.display = 'table-row';
+
+          // Remove destaque anterior
+          document.querySelectorAll('#dashboard table tbody tr').forEach(row => {
+            row.classList.remove('highlight');
+          });
+
+          // Adiciona destaque na linha encontrada
+          if (highlightIndex === i) {
+            tr.classList.add('highlight');
+            tr.setAttribute('tabindex', '-1');
+            setTimeout(() => {
+              tr.focus();
+              tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 150);
+          }
+
+          let codigo = '';
+          let descricao = '';
+          if (card.name) {
+            const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
+            if (match) {
+              codigo = match[1].trim();
+              descricao = match[2].trim();
+            } else {
+              codigo = card.name;
+              descricao = '';
+            }
+          }
+
+          function styleCell(td) {
+            td.style.borderLeft = '1px solid #e0e0e0';
+            td.style.borderRight = '1px solid #e0e0e0';
+            td.style.verticalAlign = 'middle';
+            td.style.background = '#fff';
+            td.style.paddingLeft = '10px';
+            td.style.paddingTop = '10px';
+            td.style.paddingBottom = '10px';
+            td.style.height = 'auto';
+          }
+
+          // N° Pedido
+          const tdPedido = document.createElement('td');
+          tdPedido.textContent = card.customFields && card.customFields['N° Pedido'] ? card.customFields['N° Pedido'] : '';
+          tdPedido.style.fontSize = '14px';
+          tdPedido.style.color = '#222';
+          tdPedido.style.textAlign = 'center';
+          tdPedido.style.maxWidth = '110px';
+          tdPedido.style.width = '110px';
+          tdPedido.style.minWidth = '80px';
+          styleCell(tdPedido);
+          tr.appendChild(tdPedido);
+
+          const tdCodigo = document.createElement('td');
+          tdCodigo.textContent = codigo;
+          tdCodigo.style.fontWeight = 'bold';
+          tdCodigo.style.color = '#172b4d';
+          tdCodigo.style.fontSize = '15px';
+          tdCodigo.style.maxWidth = '110px';
+          tdCodigo.style.width = '110px';
+          tdCodigo.style.minWidth = '80px';
+          styleCell(tdCodigo);
+          tr.appendChild(tdCodigo);
+
+          const tdDescricao = document.createElement('td');
+          tdDescricao.textContent = descricao;
+          tdDescricao.style.fontSize = '15px';
+          tdDescricao.style.color = '#222';
+          tdDescricao.style.maxWidth = '400px';
+          tdDescricao.style.width = '400px';
+          tdDescricao.style.minWidth = '200px';
+          tdDescricao.style.overflow = 'hidden';
+          tdDescricao.style.textOverflow = 'ellipsis';
+          tdDescricao.style.whiteSpace = 'nowrap';
+          styleCell(tdDescricao);
+          tr.appendChild(tdDescricao);
+
+          const tdLabels = document.createElement('td');
+          tdLabels.style.maxWidth = '120px';
+          tdLabels.style.width = '120px';
+          tdLabels.style.minWidth = '80px';
+          tdLabels.style.overflow = 'hidden';
+          tdLabels.style.whiteSpace = 'nowrap';
+          tdLabels.style.textOverflow = 'ellipsis';
+          if (Array.isArray(card.labels) && card.labels.length > 0) {
+            const labelsDiv = document.createElement('div');
+            labelsDiv.style.display = 'flex';
+            labelsDiv.style.gap = '8px';
+            card.labels.forEach(l => {
+              const span = document.createElement('span');
+              span.textContent = (l.name && l.name.trim().toLowerCase() === 'próximo') ? 'Iniciar' : (l.name || '');
+              span.style.background = labelColors[l.color] || '#888';
+              span.style.color = '#fff';
+              span.style.fontSize = '14px';
+              span.style.padding = '4px 12px';
+              span.style.borderRadius = '5px';
+              span.style.fontWeight = 'bold';
+              labelsDiv.appendChild(span);
+            });
+            tdLabels.appendChild(labelsDiv);
+          }
+          styleCell(tdLabels);
+          tr.appendChild(tdLabels);
+
+          const tdDue = document.createElement('td');
+          if (card.dueDate) {
+            const d = new Date(card.dueDate);
+            if (!isNaN(d)) {
+              tdDue.textContent = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()}`;
+            }
+          }
+          tdDue.style.fontSize = '13px';
+          tdDue.style.color = '#888';
+          tdDue.style.textAlign = 'center';
+          tdDue.style.maxWidth = '80px';
+          tdDue.style.width = '80px';
+          tdDue.style.minWidth = '60px';
+          styleCell(tdDue);
+          tdDue.style.paddingLeft = '0';
+          tr.appendChild(tdDue);
+
+          const tdEntregaPed = document.createElement('td');
+          if (card.customFields && card.customFields['Entrega Pedido']) {
+            const raw = card.customFields['Entrega Pedido'];
+            let data = '';
+            const isoMatch = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
+            if (isoMatch) {
+              data = `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1]}`;
+            } else {
+              const brMatch = raw.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+              if (brMatch) {
+                data = brMatch[0];
+              }
+            }
+            tdEntregaPed.textContent = data;
+          } else {
+            tdEntregaPed.textContent = '';
+          }
+          tdEntregaPed.style.fontSize = '13px';
+          tdEntregaPed.style.color = '#888';
+          tdEntregaPed.style.textAlign = 'center';
+          tdEntregaPed.style.maxWidth = '80px';
+          tdEntregaPed.style.width = '80px';
+          tdEntregaPed.style.minWidth = '60px';
+          styleCell(tdEntregaPed);
+          tdEntregaPed.style.paddingLeft = '0';
+          tr.appendChild(tdEntregaPed);
+
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        dashboard.appendChild(table);
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro: ' + (err.message || err));
+      }
+    }
+
+    // Auto sugestão
+    const searchBar = document.getElementById('searchBar');
+    const suggestions = document.getElementById('suggestions');
+    searchBar.addEventListener('input', function() {
+      const value = this.value.toLowerCase();
+      if (!value) {
+        suggestions.style.display = 'none';
+        suggestions.innerHTML = '';
+        return;
+      }
+      const matches = allCardsCache.filter(card => {
+        let codigo = '';
+        let descricao = '';
+        if (card.name) {
+          const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
+          if (match) {
+            codigo = match[1].trim();
+            descricao = match[2].trim();
+          } else {
+            codigo = card.name;
+            descricao = '';
+          }
+        }
+        return (
+          (codigo && codigo.toLowerCase().includes(value)) ||
+          (descricao && descricao.toLowerCase().includes(value))
+        );
+      }).slice(0, 8);
+      if (matches.length === 0) {
+        suggestions.style.display = 'none';
+        suggestions.innerHTML = '';
+        return;
+      }
+      suggestions.innerHTML = matches.map(card => {
+        let codigo = '';
+        let descricao = '';
+        if (card.name) {
+          const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
+          if (match) {
+            codigo = match[1].trim();
+            descricao = match[2].trim();
+          } else {
+            codigo = card.name;
+            descricao = '';
+          }
+        }
+        return `<div class='suggestion-item' style='padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;'>
+          <b>${codigo}</b> <span style='color:#888;'>${descricao}</span>
+        </div>`;
+      }).join('');
+      suggestions.style.display = 'block';
+      // Clique na sugestão
+      Array.from(suggestions.children).forEach((item, idx) => {
+        item.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          const card = matches[idx];
+          let codigo = '';
+          let descricao = '';
+          if (card.name) {
+            const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
+            if (match) {
+              codigo = match[1].trim();
+              descricao = match[2].trim();
+            } else {
+              codigo = card.name;
+              descricao = '';
+            }
+          }
+          searchBar.value = codigo;
+          suggestions.style.display = 'none';
+          window._searchTrigger = true;
+          loadCards();
+        });
+      });
+    });
+    // Esconde sugestões ao perder foco
+    searchBar.addEventListener('blur', function() {
+      setTimeout(() => { suggestions.style.display = 'none'; }, 150);
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('closed');
+      toggleIcon.innerHTML = sidebar.classList.contains('closed') ? '&gt;' : '&lt;';
+    });
+  </script>
+</body>
+</html>
