@@ -369,6 +369,7 @@
         // Agrupa cards por lista
         const listasMap = {};
         cards.forEach(card => {
+          if (card.listName && card.listName.toUpperCase() === 'MONTAGEM') return; // Não exibe MONTAGEM
           if (!listasMap[card.listName]) listasMap[card.listName] = [];
           listasMap[card.listName].push(card);
         });
