@@ -238,6 +238,8 @@
 
     // Adiciona funcionalidade ao botão Novo
     document.getElementById('btnNovo').addEventListener('click', function() {
+      const btnEditar = document.getElementById('btnEditar');
+      if (btnEditar) btnEditar.style.display = 'none';
       const tabela = document.getElementById('tabelaFerramentaria').getElementsByTagName('tbody')[0];
       // Evita múltiplas linhas abertas
       if (document.getElementById('linhaNova')) return;
@@ -432,17 +434,45 @@
       btnCancelar.style.marginLeft = '10px';
       containerSalvar.appendChild(btnCancelar);
       btnSalvar.addEventListener('click', function() {
-        // Aqui você pode implementar a lógica de salvar os dados
-        // Exemplo: pegar os valores dos inputs
-        const valores = Array.from(linha.querySelectorAll('input')).map(input => input.value);
+        // Corrige coleta dos valores
+        const valores = [];
+        linha.childNodes.forEach((td, idx) => {
+          // Obs
+          if (idx === 4) {
+            const btnObs = td.querySelector('button');
+            valores.push(btnObs ? (btnObs.dataset.obs || '') : '');
+          }
+          // Setor Solicitante
+          else if (idx === 5) {
+            const select = td.querySelector('select');
+            valores.push(select ? select.value : '');
+          }
+          // Data Limite Entrega
+          else if (idx === 6) {
+            const input = td.querySelector('input[type="date"]');
+            valores.push(input ? input.value : '');
+          }
+          // Status
+          else if (idx === 7) {
+            const select = td.querySelector('select');
+            valores.push(select ? select.value : '');
+          }
+          // Demais campos
+          else {
+            const input = td.querySelector('input');
+            valores.push(input ? input.value : '');
+          }
+        });
         // Substitui a linha de inputs por uma linha de texto
         linha.innerHTML = valores.map(v => `<td>${v}</td>`).join('');
         linha.id = '';
         containerSalvar.innerHTML = '';
+        if (btnEditar) btnEditar.style.display = '';
       });
       btnCancelar.addEventListener('click', function() {
         linha.remove();
         containerSalvar.innerHTML = '';
+        if (btnEditar) btnEditar.style.display = '';
       });
     });
   </script>
