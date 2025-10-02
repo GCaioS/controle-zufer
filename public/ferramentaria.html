@@ -471,6 +471,8 @@
             valores.push(input ? input.value : '');
           }
         });
+        // Exibe os dados capturados em um alert
+        alert('Dados inseridos:\n' + JSON.stringify(valores, null, 2));
         // Substitui a linha de inputs por uma linha de texto
         linha.innerHTML = valores.map((v, idx) => {
           if (idx === 4) {
