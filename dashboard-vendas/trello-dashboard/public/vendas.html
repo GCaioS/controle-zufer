@@ -350,6 +350,8 @@
           tr.style.height = '30px';
           tr.style.marginBottom = '6px';
           tr.style.display = 'table-row';
+          // Se tiver etiqueta Ferramentaria, pinta todas as células da linha de vermelho forte
+          const isFerramentaria = Array.isArray(card.labels) && card.labels.some(l => l.name && l.name.trim().toLowerCase() === 'ferramentaria');
 
           // Remove destaque anterior
           document.querySelectorAll('#dashboard table tbody tr').forEach(row => {
@@ -516,6 +518,13 @@
           tr.appendChild(tdEntregaPed);
 
           tbody.appendChild(tr);
+          // Após adicionar todas as células, pinta se for Ferramentaria
+          if (isFerramentaria) {
+            Array.from(tr.children).forEach(td => {
+              td.style.background = '#ffdddd'; // vermelho mais leve
+              td.style.color = '#222';
+            });
+          }
         });
         table.appendChild(tbody);
         dashboard.appendChild(table);
