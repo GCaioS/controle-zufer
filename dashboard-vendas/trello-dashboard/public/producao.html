@@ -35,6 +35,42 @@
       font-size: 13px;
       display: flex;
     }
+      /* Responsividade para telas menores */
+    @media (max-width: 1500px) {
+      .campos-destaque {
+        font-size: 11px !important;
+      }
+      .campos-personalizados {
+        font-size: 11px !important;
+      }
+      .label {
+        font-size: 12px !important;
+      }
+      .main-content {
+        padding: 10px;
+        background: #f7f3e6;
+      }
+      .dashboard-row {
+        gap: 6px;
+      }
+      .lista {
+        padding: 4px;
+      }
+      .card {
+        padding: 12px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+      .lista-titulo {
+        font-size: 10px !important;
+        padding: 6px 0;
+      }
+      .card-title {
+        font-size: 12px !important;
+      }
+    }
+
     /* SIDEBAR */
     .sidebar {
       width: 220px;
@@ -175,26 +211,26 @@
       flex: 1 1 calc(100% / 2 - 12px);
     }
     .lista-titulo {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 10px;
-  text-align: center;
-  color: #fff;
-  background: linear-gradient(90deg, #007a3d 0%, #00b894 100%);
-  border-radius: 6px;
-  padding: 8px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(90deg, #007a3d 0%, #00b894 100%);
+      border-radius: 6px;
+      padding: 8px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .card {
-  padding: 20px;
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  word-break: break-word;
-  overflow: unset;
+      padding: 20px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      word-break: break-word;
+      overflow: unset;
     }
     .card-title {
       margin-top: 15px;
