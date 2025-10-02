@@ -595,6 +595,19 @@
             tdEntregaPed.appendChild(input);
             editInputs.push({ cardId, input, tdEntregaPed, original: entregaAtual, field: 'Entrega Pedido' });
           });
+          // Descobre o id do campo personalizado 'Entrega Pedido' (agora texto)
+          let idCampoEntrega = null;
+          if (allCardsCache.length > 0 && allCardsCache[0].customFields) {
+            for (const key in allCardsCache[0].customFields) {
+              if (key.toLowerCase().includes('entrega')) {
+                const customFieldItem = (allCardsCache[0].customFieldItems || []).find(i => i.value?.text === allCardsCache[0].customFields[key] || i.value?.number === allCardsCache[0].customFields[key]);
+                if (customFieldItem) {
+                  idCampoEntrega = customFieldItem.idCustomField;
+                  break;
+                }
+              }
+            }
+          }
           // Adiciona botão Salvar e Fechar
           let btnSalvarFechar = document.getElementById('btnSalvarFechar');
           if (!btnSalvarFechar) {
@@ -617,7 +630,22 @@
               let erro = false;
               for (const item of editInputs) {
                 const { cardId, input, tdPedido, tdEntregaPed, original, field } = item;
-                const novoValor = input.value.trim();
+                let novoValor = input.value.trim();
+                // Se for campo de data, converte para o formato ISO 8601 completo (yyyy-MM-ddTHH:mm:ss.sssZ)
+                if (field === 'Entrega Pedido') {
+                  const brMatch = novoValor.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                  if (brMatch) {
+                    // Cria objeto Date e converte para ISO 8601
+                    const dateObj = new Date(`${brMatch[3]}-${brMatch[2]}-${brMatch[1]}T00:00:00.000Z`);
+                    novoValor = dateObj.toISOString();
+                  }
+                  // Se vier só yyyy-mm-dd, também converte para ISO 8601
+                  const isoMatch = novoValor.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                  if (isoMatch) {
+                    const dateObj = new Date(`${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}T00:00:00.000Z`);
+                    novoValor = dateObj.toISOString();
+                  }
+                }
                 if (novoValor !== original) {
                   try {
                     let fieldId = null;
@@ -625,29 +653,15 @@
                       if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
                       fieldId = idCampoPedido;
                     } else if (field === 'Entrega Pedido') {
-                      // Descobre o id do campo personalizado 'Entrega Pedido'
-                      if (allCardsCache.length > 0 && allCardsCache[0].customFields) {
-                        for (const key in allCardsCache[0].customFields) {
-                          if (key.toLowerCase().includes('entrega')) {
-                            const customFieldItem = (allCardsCache[0].customFieldItems || []).find(i => i.value?.text === allCardsCache[0].customFields[key] || i.value?.number === allCardsCache[0].customFields[key]);
-                            if (customFieldItem) {
-                              fieldId = customFieldItem.idCustomField;
-                              break;
-                            }
-                          }
-                        }
-                      }
+                      let fieldId = idCampoEntrega;
                       if (!fieldId) throw new Error('Campo "Entrega Pedido" não encontrado');
-                    }
-                    const res = await fetch('/update-custom-field', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ cardId, fieldId, value: novoValor })
-                    });
-                    if (!res.ok) throw new Error('Falha ao atualizar');
-                    if (field === 'N° Pedido') {
-                      tdPedido.textContent = novoValor;
-                    } else if (field === 'Entrega Pedido') {
+                      // Não converte mais para ISO, pois agora é texto
+                      const res = await fetch('/update-custom-field', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cardId, fieldId, value: novoValor })
+                      });
+                      if (!res.ok) throw new Error('Falha ao atualizar');
                       tdEntregaPed.textContent = novoValor;
                     }
                   } catch (err) {
