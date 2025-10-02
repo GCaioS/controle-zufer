@@ -4,6 +4,7 @@ const axios = require('axios');
 const path = require('path');
 const cors = require('cors');
 const open = require('open').default;
+const { exec } = require('child_process');
 
 const app = express();
 app.use(cors());
@@ -139,7 +140,12 @@ app.post('/update-custom-field', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-  open(`http://localhost:3000`).catch(() => {
-    console.log('Não foi possível abrir o navegador automaticamente.');
-  });
+  // Abre o navegador no Windows
+  if (process.platform === 'win32') {
+    exec(`start http://localhost:${PORT}`);
+  } else if (process.platform === 'darwin') {
+    exec(`open http://localhost:${PORT}`);
+  } else {
+    exec(`xdg-open http://localhost:${PORT}`);
+  }
 });
