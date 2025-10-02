@@ -178,14 +178,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .card-desc {
-      font-size: 10px;
-      color: #5e6c84;
-      word-break: break-word;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    
     .labels {
       display: flex;
       flex-wrap: wrap;
@@ -194,7 +187,7 @@
     .label {
       padding: 1px 3px;
       border-radius: 4px;
-      font-size: 9px;
+      font-size: 15px;
       color: white;
       font-weight: bold;
     }
@@ -300,38 +293,58 @@
             listaDiv.appendChild(titulo);
 
             listasMap[listName].forEach(card => {
+
               const cardDiv = document.createElement('div');
               cardDiv.className = 'card';
+
+              // Exibe o status acima do título
+              let statusValue = '';
+              if (card.customFields && card.customFields['Status']) {
+                statusValue = card.customFields['Status'];
+              }
+              if (statusValue) {
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'card-status';
+                statusDiv.textContent = `Status: ${statusValue}`;
+                statusDiv.style.fontWeight = 'bold';
+                statusDiv.style.color = '#0079bf';
+                statusDiv.style.fontSize = '13px';
+                statusDiv.style.marginBottom = '2px';
+                cardDiv.appendChild(statusDiv);
+              }
+
+              // Exibe etiquetas acima do título
+              const labelsDiv = document.createElement('div');
+              labelsDiv.className = 'labels';
+              (card.labels || []).forEach(l => {
+                const span = document.createElement('span');
+                span.className = 'label';
+                span.textContent = l.name || '';
+                span.style.backgroundColor = labelColors[l.color] || '#888';
+                labelsDiv.appendChild(span);
+              });
+              cardDiv.appendChild(labelsDiv);
 
               const titleDiv = document.createElement('div');
               titleDiv.className = 'card-title';
               titleDiv.textContent = escapeHtml(card.name);
               cardDiv.appendChild(titleDiv);
 
-              const labelsContainer = document.createElement('div');
-                      // Exibe campos personalizados
-                      if (card.customFields && Object.keys(card.customFields).length > 0) {
-                        const customFieldsDiv = document.createElement('div');
-                        customFieldsDiv.style.fontSize = '10px';
-                        customFieldsDiv.style.color = '#333';
-                        customFieldsDiv.style.marginTop = '2px';
-                        customFieldsDiv.style.wordBreak = 'break-word';
-                        for (const [key, value] of Object.entries(card.customFields)) {
-                          const fieldDiv = document.createElement('div');
-                          fieldDiv.textContent = `${key}: ${value ?? ''}`;
-                          customFieldsDiv.appendChild(fieldDiv);
-                        }
-                        cardDiv.appendChild(customFieldsDiv);
-                      }
-              labelsContainer.className = 'labels';
-              (card.labels || []).forEach(l => {
-                const span = document.createElement('span');
-                span.className = 'label';
-                span.textContent = l.name || '';
-                span.style.backgroundColor = labelColors[l.color] || '#888';
-                labelsContainer.appendChild(span);
-              });
-              cardDiv.appendChild(labelsContainer);
+
+              // Exibe campos personalizados
+              if (card.customFields && Object.keys(card.customFields).length > 0) {
+                const customFieldsDiv = document.createElement('div');
+                customFieldsDiv.style.fontSize = '10px';
+                customFieldsDiv.style.color = '#333';
+                customFieldsDiv.style.marginTop = '2px';
+                customFieldsDiv.style.wordBreak = 'break-word';
+                for (const [key, value] of Object.entries(card.customFields)) {
+                  const fieldDiv = document.createElement('div');
+                  fieldDiv.textContent = `${key}: ${value ?? ''}`;
+                  customFieldsDiv.appendChild(fieldDiv);
+                }
+                cardDiv.appendChild(customFieldsDiv);
+              }
 
               listaDiv.appendChild(cardDiv);
             });
