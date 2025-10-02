@@ -278,7 +278,7 @@
 
   <!-- CLASSE e TIPO lado a lado, com espaçamento e título ocupando duas colunas -->
   <div style="display: flex; gap: 32px; margin-top: 12px;">
-  <table style="min-width: 140px; max-width: 180px; width: 22%; border-collapse: collapse;">
+  <table style="min-width: 140px; max-width: 180px; width: 22%; border-collapse: collapse; align-self: flex-start;">
       <tr>
         <th colspan="2" style="text-align: center;">Classe</th>
       </tr>
@@ -295,7 +295,7 @@
         <td style="width:28px;text-align:center;"><span class="tick"></span></td><td>Pneumática</td>
       </tr>
     </table>
-  <table style="min-width: 140px; max-width: 180px; width: 22%; border-collapse: collapse;">
+  <table style="min-width: 140px; max-width: 180px; width: 22%; border-collapse: collapse; align-self: flex-start;">
       <tr>
         <th colspan="2" style="text-align: center;">Tipo</th>
       </tr>
@@ -312,10 +312,14 @@
         <td style="width:28px;text-align:center;"><span class="tick"></span></td><td></td>
       </tr>
     </table>
-    <div class="data-criacao-block" style="width: 20%;">
+    <div class="data-criacao-block" style="width: 20%; margin-left: auto; align-self: flex-end;">
       <table style="width: 100%;">
-        <tr><td>Data de Criação:</td></tr>
-        <tr><td>${dados[1] || ''}</td></tr>
+        <tr>
+          <th style="text-align: center;">Data de Criação</th>
+        </tr>
+        <tr>
+          <td style="text-align: center;">${dados[1] || ''}</td>
+        </tr>
       </table>
     </div>
   </div>
