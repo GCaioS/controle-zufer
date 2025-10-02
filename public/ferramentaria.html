@@ -207,7 +207,7 @@
       <button id="btnEditar" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s;">Editar</button>
     </div>
     <div style="overflow-x:auto; margin-top: 24px;">
-      <table class="ferramentaria-table">
+      <table class="ferramentaria-table" id="tabelaFerramentaria">
         <thead>
           <tr>
             <th>N° OS</th>
@@ -221,18 +221,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
         </tbody>
       </table>
+    </div>
+    <div id="containerSalvar" style="max-width: 1000px; margin: 18px auto 0 auto; display: flex; justify-content: flex-end; align-items: center;">
     </div>
   </div>
   <script>
@@ -242,6 +234,54 @@
     toggleBtn.addEventListener('click', () => {
       sidebar.classList.toggle('closed');
       toggleIcon.innerHTML = sidebar.classList.contains('closed') ? '&gt;' : '&lt;';
+    });
+
+    // Adiciona funcionalidade ao botão Novo
+    document.getElementById('btnNovo').addEventListener('click', function() {
+      const tabela = document.getElementById('tabelaFerramentaria').getElementsByTagName('tbody')[0];
+      // Evita múltiplas linhas abertas
+      if (document.getElementById('linhaNova')) return;
+      const linha = document.createElement('tr');
+      linha.id = 'linhaNova';
+      const campos = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'status'];
+      campos.forEach((campo, idx) => {
+        const td = document.createElement('td');
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.style.width = '100%';
+        input.style.padding = '6px';
+        input.style.fontSize = '14px';
+        input.style.boxSizing = 'border-box';
+        input.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+        td.appendChild(input);
+        linha.appendChild(td);
+      });
+      tabela.appendChild(linha);
+      // Adiciona botão salvar
+      const containerSalvar = document.getElementById('containerSalvar');
+      containerSalvar.innerHTML = '';
+      const btnSalvar = document.createElement('button');
+      btnSalvar.id = 'btnSalvar';
+      btnSalvar.textContent = 'Salvar';
+      btnSalvar.style.padding = '8px 18px';
+      btnSalvar.style.fontSize = '15px';
+      btnSalvar.style.border = 'none';
+      btnSalvar.style.borderRadius = '6px';
+      btnSalvar.style.background = '#007bff';
+      btnSalvar.style.color = '#fff';
+      btnSalvar.style.fontWeight = 'bold';
+      btnSalvar.style.cursor = 'pointer';
+      btnSalvar.style.transition = 'background 0.2s';
+      containerSalvar.appendChild(btnSalvar);
+      btnSalvar.addEventListener('click', function() {
+        // Aqui você pode implementar a lógica de salvar os dados
+        // Exemplo: pegar os valores dos inputs
+        const valores = Array.from(linha.querySelectorAll('input')).map(input => input.value);
+        // Substitui a linha de inputs por uma linha de texto
+        linha.innerHTML = valores.map(v => `<td>${v}</td>`).join('');
+        linha.id = '';
+        containerSalvar.innerHTML = '';
+      });
     });
   </script>
 </body>
