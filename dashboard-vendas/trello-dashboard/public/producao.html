@@ -244,7 +244,7 @@
       box-sizing: border-box;
     }
     .dashboard-row:nth-child(5) .lista {
-      flex: 1 1 calc(100% / 2 - 12px);
+  /* Removido para permitir que INJ 21 e INJ 22 ocupem uma coluna cada */
     }
     .lista-titulo {
       font-weight: bold;
@@ -368,193 +368,336 @@
         const sortedListNames = Object.keys(listasMap)
           .sort((a,b) => parseInt(a.replace(/\D/g,''),10) - parseInt(b.replace(/\D/g,''),10));
 
-        // Layout: quantidade de listas por linha
-        const layout = [5,5,5,5,2];
-        let index = 0;
+  // Layout: quantidade de listas por linha
+  const layout = [5,5,5,5,4];
+  let index = 0;
 
-        layout.forEach(count => {
-          const rowDiv = document.createElement('div');
-          rowDiv.className = 'dashboard-row';
+  layout.forEach((count, rowIdx) => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'dashboard-row';
 
-          for(let i=0; i<count; i++){
-            if(index >= sortedListNames.length) break;
-            const listName = sortedListNames[index];
-            const listaDiv = document.createElement('div');
-            listaDiv.className = 'lista';
-
-            const titulo = document.createElement('div');
-            titulo.className = 'lista-titulo';
-            titulo.textContent = listName;
-            listaDiv.appendChild(titulo);
-
-            listasMap[listName].slice(0,2).forEach(card => {
-
-              const cardDiv = document.createElement('div');
-              cardDiv.className = 'card';
-
-              // Exibe o status acima do título
-              let statusValue = '';
-              if (card.customFields && card.customFields['Status']) {
-                statusValue = card.customFields['Status'];
-              }
-              if (statusValue) {
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'card-status';
-                statusDiv.textContent = `Status: ${statusValue}`;
-                statusDiv.style.fontWeight = 'bold';
-                statusDiv.style.color = '#0079bf';
-                statusDiv.style.fontSize = '13px';
-                statusDiv.style.marginBottom = '2px';
-                cardDiv.appendChild(statusDiv);
-              }
-
-              // Exibe OP e Ciclo acima das etiquetas
-              if (card.customFields) {
-                const topFieldsDiv = document.createElement('div');
-                topFieldsDiv.className = 'campos-destaque';
-                topFieldsDiv.style.marginBottom = '25px';
-                ['OP', 'Ciclo'].forEach(campo => {
+    // Última linha: INJ 21, INJ 22, vazio, vazio
+    if (rowIdx === layout.length - 1) {
+      // Busca INJ 21 e INJ 22
+      const inj21 = sortedListNames.find(n => n.replace(/\D/g, '') === '21');
+      const inj22 = sortedListNames.find(n => n.replace(/\D/g, '') === '22');
+      const nomes = [inj21, inj22];
+      for (let i = 0; i < 4; i++) {
+        const listaDiv = document.createElement('div');
+        listaDiv.className = 'lista';
+        if (i < 2 && nomes[i]) {
+          const titulo = document.createElement('div');
+          titulo.className = 'lista-titulo';
+          titulo.textContent = nomes[i];
+          listaDiv.appendChild(titulo);
+          listasMap[nomes[i]].slice(0,2).forEach(card => {
+            // ...código de renderização do card...
+            // Copiado do bloco original
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            let statusValue = '';
+            if (card.customFields && card.customFields['Status']) {
+              statusValue = card.customFields['Status'];
+            }
+            if (statusValue) {
+              const statusDiv = document.createElement('div');
+              statusDiv.className = 'card-status';
+              statusDiv.textContent = `Status: ${statusValue}`;
+              statusDiv.style.fontWeight = 'bold';
+              statusDiv.style.color = '#0079bf';
+              statusDiv.style.fontSize = '13px';
+              statusDiv.style.marginBottom = '2px';
+              cardDiv.appendChild(statusDiv);
+            }
+            if (card.customFields) {
+              const topFieldsDiv = document.createElement('div');
+              topFieldsDiv.className = 'campos-destaque';
+              topFieldsDiv.style.marginBottom = '25px';
+              ['OP', 'Ciclo'].forEach(campo => {
+                const fieldDiv = document.createElement('div');
+                let valor = card.customFields[campo];
+                if (valor && typeof valor === 'string' && valor.length > 18) {
+                  valor = valor.substring(0, 15) + '...';
+                }
+                fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
+                topFieldsDiv.appendChild(fieldDiv);
+              });
+              cardDiv.appendChild(topFieldsDiv);
+            }
+            const labelsDiv = document.createElement('div');
+            labelsDiv.className = 'labels';
+            (card.labels || []).forEach(l => {
+              const span = document.createElement('span');
+              span.className = 'label';
+              span.textContent = l.name || '';
+              span.style.backgroundColor = labelColors[l.color] || '#888';
+              labelsDiv.appendChild(span);
+            });
+            cardDiv.appendChild(labelsDiv);
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'card-title';
+            titleDiv.textContent = escapeHtml(card.name);
+            cardDiv.appendChild(titleDiv);
+            let customFieldsDiv = null;
+            if (card.customFields && Object.keys(card.customFields).length > 0) {
+              customFieldsDiv = document.createElement('div');
+              customFieldsDiv.className = 'campos-personalizados';
+              customFieldsDiv.style.marginTop = '25px';
+              const camposOrdem = [
+                ['Molde', 'Material'],
+                ['Cor', 'Quantidade'],
+                ['Produção', 'N° Pedido']
+              ];
+              camposOrdem.forEach(par => {
+                par.forEach(campo => {
                   const fieldDiv = document.createElement('div');
                   let valor = card.customFields[campo];
                   if (valor && typeof valor === 'string' && valor.length > 18) {
                     valor = valor.substring(0, 15) + '...';
                   }
                   fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
-                  topFieldsDiv.appendChild(fieldDiv);
+                  customFieldsDiv.appendChild(fieldDiv);
                 });
-                cardDiv.appendChild(topFieldsDiv);
-              }
-
-              // Exibe etiquetas
-              const labelsDiv = document.createElement('div');
-              labelsDiv.className = 'labels';
-              (card.labels || []).forEach(l => {
-                const span = document.createElement('span');
-                span.className = 'label';
-                span.textContent = l.name || '';
-                span.style.backgroundColor = labelColors[l.color] || '#888';
-                labelsDiv.appendChild(span);
               });
-              cardDiv.appendChild(labelsDiv);
-
-              const titleDiv = document.createElement('div');
-              titleDiv.className = 'card-title';
-              titleDiv.textContent = escapeHtml(card.name);
-              cardDiv.appendChild(titleDiv);
-
-
-              // Exibe os demais campos personalizados
-              let customFieldsDiv = null;
-              if (card.customFields && Object.keys(card.customFields).length > 0) {
-                customFieldsDiv = document.createElement('div');
-                customFieldsDiv.className = 'campos-personalizados';
-                customFieldsDiv.style.marginTop = '25px';
-                // Ordem e agrupamento dos campos (exceto OP e Ciclo)
-                const camposOrdem = [
-                  ['Molde', 'Material'],
-                  ['Cor', 'Quantidade'],
-                  ['Produção', 'N° Pedido']
-                ];
-                camposOrdem.forEach(par => {
-                  par.forEach(campo => {
-                    const fieldDiv = document.createElement('div');
-                    let valor = card.customFields[campo];
-                    if (valor && typeof valor === 'string' && valor.length > 18) {
-                      valor = valor.substring(0, 15) + '...';
-                    }
-                    fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
-                    customFieldsDiv.appendChild(fieldDiv);
-                  });
-                });
-                cardDiv.appendChild(customFieldsDiv);
+              cardDiv.appendChild(customFieldsDiv);
+            }
+            function abreviarAno(dataStr) {
+              if (!dataStr || dataStr === 'N/A') return dataStr;
+              const partes = dataStr.split('/');
+              if (partes.length === 3) {
+                partes[2] = partes[2].slice(-2);
+                return partes.join('/');
               }
-
-              // Adiciona datas de início e término abaixo da área dos campos personalizados
-              function abreviarAno(dataStr) {
-                if (!dataStr || dataStr === 'N/A') return dataStr;
-                const partes = dataStr.split('/');
-                if (partes.length === 3) {
-                  partes[2] = partes[2].slice(-2);
-                  return partes.join('/');
-                }
-                return dataStr;
+              return dataStr;
+            }
+            const dataInicio = card.startDate ? abreviarAno(new Date(card.startDate).toLocaleDateString('pt-BR')) : 'N/A';
+            const dataFim = card.dueDate ? abreviarAno(new Date(card.dueDate).toLocaleDateString('pt-BR')) : 'N/A';
+            const datasDiv = document.createElement('div');
+            datasDiv.className = 'datas-campo';
+            datasDiv.style.marginTop = '12px';
+            datasDiv.style.fontSize = '14px';
+            datasDiv.style.color = '#333';
+            datasDiv.style.display = 'flex';
+            datasDiv.style.gap = '10px';
+            datasDiv.style.alignItems = 'center';
+            const inicioBloco = document.createElement('div');
+            inicioBloco.style.display = 'flex';
+            inicioBloco.style.flexDirection = 'column';
+            inicioBloco.style.alignItems = 'flex-start';
+            const inicioLabel = document.createElement('span');
+            inicioLabel.textContent = 'Inic:';
+            inicioLabel.style.fontWeight = 'normal';
+            const inicioSpan = document.createElement('span');
+            inicioSpan.textContent = dataInicio;
+            inicioSpan.style.border = '2px solid #8fd19e';
+            inicioSpan.style.background = '#eafbe5';
+            inicioSpan.style.borderRadius = '6px';
+            inicioSpan.style.padding = '2px 10px';
+            inicioSpan.style.fontWeight = 'bold';
+            inicioBloco.appendChild(inicioLabel);
+            inicioBloco.appendChild(inicioSpan);
+            const fimBloco = document.createElement('div');
+            fimBloco.style.display = 'flex';
+            fimBloco.style.flexDirection = 'column';
+            fimBloco.style.alignItems = 'flex-start';
+            const fimLabel = document.createElement('span');
+            fimLabel.textContent = 'Fim:';
+            fimLabel.style.fontWeight = 'normal';
+            const fimSpan = document.createElement('span');
+            fimSpan.textContent = dataFim;
+            fimSpan.style.border = '2px solid #8fd19e';
+            fimSpan.style.borderRadius = '6px';
+            fimSpan.style.padding = '2px 10px';
+            fimSpan.style.fontWeight = 'bold';
+            let corFundoFim = '#eafbe5';
+            if (card.dueDate) {
+              const hoje = new Date();
+              hoje.setHours(0,0,0,0);
+              const fimDate = new Date(card.dueDate);
+              fimDate.setHours(0,0,0,0);
+              const diffDias = Math.floor((fimDate - hoje) / (1000*60*60*24));
+              if (diffDias === 0) {
+                corFundoFim = '#ffd6d6';
+                fimSpan.style.border = '2px solid #e57373';
+              } else if (diffDias === 1) {
+                corFundoFim = '#fff9c4';
+                fimSpan.style.border = '2px solid #ffe082';
               }
-              const dataInicio = card.startDate ? abreviarAno(new Date(card.startDate).toLocaleDateString('pt-BR')) : 'N/A';
-              const dataFim = card.dueDate ? abreviarAno(new Date(card.dueDate).toLocaleDateString('pt-BR')) : 'N/A';
-              const datasDiv = document.createElement('div');
-              datasDiv.className = 'datas-campo';
-              datasDiv.style.marginTop = '12px';
-              datasDiv.style.fontSize = '14px';
-              datasDiv.style.color = '#333';
-              datasDiv.style.display = 'flex';
-              datasDiv.style.gap = '10px';
-              datasDiv.style.alignItems = 'center';
+            }
+            fimSpan.style.background = corFundoFim;
+            fimBloco.appendChild(fimLabel);
+            fimBloco.appendChild(fimSpan);
+            datasDiv.appendChild(inicioBloco);
+            datasDiv.appendChild(fimBloco);
+            cardDiv.appendChild(datasDiv);
+            listaDiv.appendChild(cardDiv);
+          });
+        } else {
+          // Espaço vazio
+          listaDiv.innerHTML = '';
+        }
+        rowDiv.appendChild(listaDiv);
+      }
+      dashboard.appendChild(rowDiv);
+      return;
+    }
 
-              // Bloco início
-              const inicioBloco = document.createElement('div');
-              inicioBloco.style.display = 'flex';
-              inicioBloco.style.flexDirection = 'column';
-              inicioBloco.style.alignItems = 'flex-start';
-              const inicioLabel = document.createElement('span');
-              inicioLabel.textContent = 'Inic:';
-              inicioLabel.style.fontWeight = 'normal';
-              const inicioSpan = document.createElement('span');
-              inicioSpan.textContent = dataInicio;
-              inicioSpan.style.border = '2px solid #8fd19e';
-              inicioSpan.style.background = '#eafbe5';
-              inicioSpan.style.borderRadius = '6px';
-              inicioSpan.style.padding = '2px 10px';
-              inicioSpan.style.fontWeight = 'bold';
-              inicioBloco.appendChild(inicioLabel);
-              inicioBloco.appendChild(inicioSpan);
-
-              // Bloco fim
-              const fimBloco = document.createElement('div');
-              fimBloco.style.display = 'flex';
-              fimBloco.style.flexDirection = 'column';
-              fimBloco.style.alignItems = 'flex-start';
-              const fimLabel = document.createElement('span');
-              fimLabel.textContent = 'Fim:';
-              fimLabel.style.fontWeight = 'normal';
-              const fimSpan = document.createElement('span');
-              fimSpan.textContent = dataFim;
-              fimSpan.style.border = '2px solid #8fd19e';
-              fimSpan.style.borderRadius = '6px';
-              fimSpan.style.padding = '2px 10px';
-              fimSpan.style.fontWeight = 'bold';
-              // Lógica de cor do fundo para data de Fim
-              let corFundoFim = '#eafbe5'; // verde claro padrão
-              if (card.dueDate) {
-                const hoje = new Date();
-                hoje.setHours(0,0,0,0);
-                const fimDate = new Date(card.dueDate);
-                fimDate.setHours(0,0,0,0);
-                const diffDias = Math.floor((fimDate - hoje) / (1000*60*60*24));
-                if (diffDias === 0) {
-                  corFundoFim = '#ffd6d6'; // vermelho claro
-                  fimSpan.style.border = '2px solid #e57373';
-                } else if (diffDias === 1) {
-                  corFundoFim = '#fff9c4'; // amarelo claro
-                  fimSpan.style.border = '2px solid #ffe082';
-                }
-              }
-              fimSpan.style.background = corFundoFim;
-              fimBloco.appendChild(fimLabel);
-              fimBloco.appendChild(fimSpan);
-
-              datasDiv.appendChild(inicioBloco);
-              datasDiv.appendChild(fimBloco);
-              cardDiv.appendChild(datasDiv);
-
-              listaDiv.appendChild(cardDiv);
-            });
-
-            rowDiv.appendChild(listaDiv);
-            index++;
-          }
-
-          dashboard.appendChild(rowDiv);
+    // Demais linhas (original)
+    for(let i=0; i<count; i++){
+      if(index >= sortedListNames.length) break;
+      const listName = sortedListNames[index];
+      const listaDiv = document.createElement('div');
+      listaDiv.className = 'lista';
+      const titulo = document.createElement('div');
+      titulo.className = 'lista-titulo';
+      titulo.textContent = listName;
+      listaDiv.appendChild(titulo);
+      listasMap[listName].slice(0,2).forEach(card => {
+        // ...código de renderização do card...
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        let statusValue = '';
+        if (card.customFields && card.customFields['Status']) {
+          statusValue = card.customFields['Status'];
+        }
+        if (statusValue) {
+          const statusDiv = document.createElement('div');
+          statusDiv.className = 'card-status';
+          statusDiv.textContent = `Status: ${statusValue}`;
+          statusDiv.style.fontWeight = 'bold';
+          statusDiv.style.color = '#0079bf';
+          statusDiv.style.fontSize = '13px';
+          statusDiv.style.marginBottom = '2px';
+          cardDiv.appendChild(statusDiv);
+        }
+        if (card.customFields) {
+          const topFieldsDiv = document.createElement('div');
+          topFieldsDiv.className = 'campos-destaque';
+          topFieldsDiv.style.marginBottom = '25px';
+          ['OP', 'Ciclo'].forEach(campo => {
+            const fieldDiv = document.createElement('div');
+            let valor = card.customFields[campo];
+            if (valor && typeof valor === 'string' && valor.length > 18) {
+              valor = valor.substring(0, 15) + '...';
+            }
+            fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
+            topFieldsDiv.appendChild(fieldDiv);
+          });
+          cardDiv.appendChild(topFieldsDiv);
+        }
+        const labelsDiv = document.createElement('div');
+        labelsDiv.className = 'labels';
+        (card.labels || []).forEach(l => {
+          const span = document.createElement('span');
+          span.className = 'label';
+          span.textContent = l.name || '';
+          span.style.backgroundColor = labelColors[l.color] || '#888';
+          labelsDiv.appendChild(span);
         });
+        cardDiv.appendChild(labelsDiv);
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'card-title';
+        titleDiv.textContent = escapeHtml(card.name);
+        cardDiv.appendChild(titleDiv);
+        let customFieldsDiv = null;
+        if (card.customFields && Object.keys(card.customFields).length > 0) {
+          customFieldsDiv = document.createElement('div');
+          customFieldsDiv.className = 'campos-personalizados';
+          customFieldsDiv.style.marginTop = '25px';
+          const camposOrdem = [
+            ['Molde', 'Material'],
+            ['Cor', 'Quantidade'],
+            ['Produção', 'N° Pedido']
+          ];
+          camposOrdem.forEach(par => {
+            par.forEach(campo => {
+              const fieldDiv = document.createElement('div');
+              let valor = card.customFields[campo];
+              if (valor && typeof valor === 'string' && valor.length > 18) {
+                valor = valor.substring(0, 15) + '...';
+              }
+              fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
+              customFieldsDiv.appendChild(fieldDiv);
+            });
+          });
+          cardDiv.appendChild(customFieldsDiv);
+        }
+        function abreviarAno(dataStr) {
+          if (!dataStr || dataStr === 'N/A') return dataStr;
+          const partes = dataStr.split('/');
+          if (partes.length === 3) {
+            partes[2] = partes[2].slice(-2);
+            return partes.join('/');
+          }
+          return dataStr;
+        }
+        const dataInicio = card.startDate ? abreviarAno(new Date(card.startDate).toLocaleDateString('pt-BR')) : 'N/A';
+        const dataFim = card.dueDate ? abreviarAno(new Date(card.dueDate).toLocaleDateString('pt-BR')) : 'N/A';
+        const datasDiv = document.createElement('div');
+        datasDiv.className = 'datas-campo';
+        datasDiv.style.marginTop = '12px';
+        datasDiv.style.fontSize = '14px';
+        datasDiv.style.color = '#333';
+        datasDiv.style.display = 'flex';
+        datasDiv.style.gap = '10px';
+        datasDiv.style.alignItems = 'center';
+        const inicioBloco = document.createElement('div');
+        inicioBloco.style.display = 'flex';
+        inicioBloco.style.flexDirection = 'column';
+        inicioBloco.style.alignItems = 'flex-start';
+        const inicioLabel = document.createElement('span');
+        inicioLabel.textContent = 'Inic:';
+        inicioLabel.style.fontWeight = 'normal';
+        const inicioSpan = document.createElement('span');
+        inicioSpan.textContent = dataInicio;
+        inicioSpan.style.border = '2px solid #8fd19e';
+        inicioSpan.style.background = '#eafbe5';
+        inicioSpan.style.borderRadius = '6px';
+        inicioSpan.style.padding = '2px 10px';
+        inicioSpan.style.fontWeight = 'bold';
+        inicioBloco.appendChild(inicioLabel);
+        inicioBloco.appendChild(inicioSpan);
+        const fimBloco = document.createElement('div');
+        fimBloco.style.display = 'flex';
+        fimBloco.style.flexDirection = 'column';
+        fimBloco.style.alignItems = 'flex-start';
+        const fimLabel = document.createElement('span');
+        fimLabel.textContent = 'Fim:';
+        fimLabel.style.fontWeight = 'normal';
+        const fimSpan = document.createElement('span');
+        fimSpan.textContent = dataFim;
+        fimSpan.style.border = '2px solid #8fd19e';
+        fimSpan.style.borderRadius = '6px';
+        fimSpan.style.padding = '2px 10px';
+        fimSpan.style.fontWeight = 'bold';
+        let corFundoFim = '#eafbe5';
+        if (card.dueDate) {
+          const hoje = new Date();
+          hoje.setHours(0,0,0,0);
+          const fimDate = new Date(card.dueDate);
+          fimDate.setHours(0,0,0,0);
+          const diffDias = Math.floor((fimDate - hoje) / (1000*60*60*24));
+          if (diffDias === 0) {
+            corFundoFim = '#ffd6d6';
+            fimSpan.style.border = '2px solid #e57373';
+          } else if (diffDias === 1) {
+            corFundoFim = '#fff9c4';
+            fimSpan.style.border = '2px solid #ffe082';
+          }
+        }
+        fimSpan.style.background = corFundoFim;
+        fimBloco.appendChild(fimLabel);
+        fimBloco.appendChild(fimSpan);
+        datasDiv.appendChild(inicioBloco);
+        datasDiv.appendChild(fimBloco);
+        cardDiv.appendChild(datasDiv);
+        listaDiv.appendChild(cardDiv);
+      });
+      rowDiv.appendChild(listaDiv);
+      index++;
+    }
+    dashboard.appendChild(rowDiv);
+  });
 
       } catch (err) {
         console.error(err);
