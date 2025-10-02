@@ -43,11 +43,13 @@ app.get('/cards/:boardId', async (req, res) => {
     const cards = cardsRes.data
       .map(card => {
         let customFields = {};
-        if (Array.isArray(card.customFieldItems)) {
-          card.customFieldItems.forEach(item => {
-            const def = customFieldsDefs.find(f => f.id === item.idCustomField);
-            if (!def) return;
-            let value = null;
+        // Preenche todos os campos personalizados, mesmo que estejam vazios
+        customFieldsDefs.forEach(def => {
+          let value = null;
+          const item = Array.isArray(card.customFieldItems)
+            ? card.customFieldItems.find(i => i.idCustomField === def.id)
+            : null;
+          if (item) {
             if (item.value) {
               if (item.value.text) value = item.value.text;
               else if (item.value.number) value = item.value.number;
@@ -57,9 +59,9 @@ app.get('/cards/:boardId', async (req, res) => {
               const opt = def.options.find(o => o.id === item.idValue);
               value = opt ? opt.value.text : item.idValue;
             }
-            customFields[def.name] = value;
-          });
-        }
+          }
+          customFields[def.name] = value !== null && value !== undefined && value !== '' ? value : 'N/A';
+        });
 
         if ('produção' in customFields) delete customFields['produção'];
 
