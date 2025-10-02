@@ -294,11 +294,11 @@
         table.style.width = '100%';
         table.style.maxWidth = '1100px';
         table.style.margin = '0 auto';
-        table.style.background = '#fff';
-        table.style.borderCollapse = 'collapse';
-        table.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
-        table.style.borderRadius = '0';
-        table.style.overflow = 'hidden';
+  table.style.background = '#fff';
+  table.style.borderCollapse = 'collapse';
+  table.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
+  table.style.borderRadius = '16px';
+  table.style.overflow = 'hidden';
 
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
@@ -307,10 +307,10 @@
           const th = document.createElement('th');
           th.textContent = h;
           th.style.padding = '10px 8px';
-          th.style.background = '#f4f5f7';
+          th.style.background = '#0079bf'; // azul
           th.style.fontWeight = 'bold';
           th.style.fontSize = '15px';
-          th.style.color = '#222';
+          th.style.color = '#fff';
           th.style.borderBottom = '1px solid #e0e0e0';
           th.style.textAlign = 'center';
           if (h === 'Status' || h === 'Etiquetas') {
