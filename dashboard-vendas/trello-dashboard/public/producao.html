@@ -13,6 +13,18 @@
       grid-template-columns: 1fr 1fr;
       gap: 4px 24px;
     }
+
+    .campos-destaque {
+      background: #e3f2fd;
+      border: 2px solid #b4d9f7;
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 16px;
+      font-weight: bold;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 60px;
+    }
     body {
       font-family: Arial, sans-serif;
       background: #f4f5f7;
@@ -326,8 +338,8 @@
               // Exibe OP e Ciclo acima das etiquetas
               if (card.customFields) {
                 const topFieldsDiv = document.createElement('div');
-                topFieldsDiv.className = 'campos-personalizados';
-                topFieldsDiv.style.marginBottom = '25px';
+                  topFieldsDiv.className = 'campos-destaque';
+                topFieldsDiv.style.marginBottom = '20px';
                 ['OP', 'Ciclo'].forEach(campo => {
                   const fieldDiv = document.createElement('div');
                   let valor = card.customFields[campo];
