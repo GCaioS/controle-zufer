@@ -315,7 +315,7 @@
             titulo.textContent = listName;
             listaDiv.appendChild(titulo);
 
-            listasMap[listName].forEach(card => {
+            listasMap[listName].slice(0,2).forEach(card => {
 
               const cardDiv = document.createElement('div');
               cardDiv.className = 'card';
