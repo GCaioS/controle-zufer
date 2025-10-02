@@ -5,10 +5,13 @@
   <title>Dashboard Trello Estilizado</title>
   <style>
     .campos-personalizados {
-      font-size: 16px;
+      font-size: 14px;
       color: #333;
       margin-top: 2px;
       word-break: break-word;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 24px;
     }
     body {
       font-family: Arial, sans-serif;
@@ -342,11 +345,21 @@
               if (card.customFields && Object.keys(card.customFields).length > 0) {
                 const customFieldsDiv = document.createElement('div');
                 customFieldsDiv.className = 'campos-personalizados';
-                for (const [key, value] of Object.entries(card.customFields)) {
-                  const fieldDiv = document.createElement('div');
-                  fieldDiv.textContent = `${key}: ${value ?? ''}`;
-                  customFieldsDiv.appendChild(fieldDiv);
-                }
+                // Ordem e agrupamento dos campos
+                const camposOrdem = [
+                  ['OP', 'Molde'],
+                  ['Material', 'Cor'],
+                  ['Quantidade', 'Produção'],
+                  ['N° Pedido', 'Ciclo']
+                ];
+                camposOrdem.forEach(par => {
+                  par.forEach(campo => {
+                    const fieldDiv = document.createElement('div');
+                    let valor = card.customFields[campo];
+                    fieldDiv.textContent = `${campo}: ${valor ?? 'N/A'}`;
+                    customFieldsDiv.appendChild(fieldDiv);
+                  });
+                });
                 cardDiv.appendChild(customFieldsDiv);
               }
 
