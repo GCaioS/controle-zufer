@@ -244,12 +244,20 @@
         const res = await fetch(`/cards/${boardId}`);
         if (!res.ok) throw new Error('Erro ao carregar cards');
         let cards = await res.json();
-        // Ordena: status 'Em andamento' primeiro
+        // Ordena: 'Ferramentaria' primeiro, depois 'Em andamento'
         cards.sort((a, b) => {
+          function isFerramentaria(card) {
+            if (!Array.isArray(card.labels)) return false;
+            return card.labels.some(l => l.name && l.name.trim().toLowerCase() === 'ferramentaria');
+          }
           function isEmAndamento(card) {
             if (!Array.isArray(card.labels)) return false;
             return card.labels.some(l => l.name && l.name.trim().toLowerCase() === 'em andamento');
           }
+          // Ferramentaria tem prioridade máxima
+          if (isFerramentaria(a) && !isFerramentaria(b)) return -1;
+          if (!isFerramentaria(a) && isFerramentaria(b)) return 1;
+          // Depois, Em andamento
           return (isEmAndamento(b) ? 1 : 0) - (isEmAndamento(a) ? 1 : 0);
         });
         allCardsCache = cards;
@@ -424,10 +432,23 @@
             const labelsDiv = document.createElement('div');
             labelsDiv.style.display = 'flex';
             labelsDiv.style.gap = '8px';
-            card.labels.forEach(l => {
+            // Prioriza Ferramentaria
+            let labelFerramentaria = card.labels.find(l => l.name && l.name.trim().toLowerCase() === 'ferramentaria');
+            let labelsToShow = [];
+            if (labelFerramentaria) {
+              labelsToShow = [labelFerramentaria];
+            } else {
+              labelsToShow = card.labels;
+            }
+            labelsToShow.forEach(l => {
               const span = document.createElement('span');
               span.textContent = (l.name && l.name.trim().toLowerCase() === 'próximo') ? 'Iniciar' : (l.name || '');
-              span.style.background = labelColors[l.color] || '#888';
+              // Se for Ferramentaria, força vermelho
+              if (l.name && l.name.trim().toLowerCase() === 'ferramentaria') {
+                span.style.background = labelColors['red'];
+              } else {
+                span.style.background = labelColors[l.color] || '#888';
+              }
               span.style.color = '#fff';
               span.style.fontSize = '14px';
               span.style.padding = '4px 12px';
