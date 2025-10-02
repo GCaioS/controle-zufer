@@ -200,8 +200,9 @@
   <div style="margin-top: 30px; margin-bottom: 8px;">
     <h2 style="margin: 0 0 0 8px;">Acompanhamento de Pedidos</h2>
   </div>
-  <div style="width: 100%; display: flex; justify-content: flex-end; margin-bottom: 0;">
-    <button id="btnEditarPedidos" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #0079bf; color: #fff; font-weight: bold; cursor: pointer; margin-right: 80px; margin-top: 30px;">Editar Pedidos</button>
+  <div id="btnContainer" style="width: 100%; display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-bottom: 18px; margin-top: 0;">
+    <button id="btnEditarPedidos" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s;">Editar Pedidos</button>
+    <!-- O botão 'Salvar e Fechar' será inserido dinamicamente, mas já estilizamos via JS -->
   </div>
   <div id="dashboard"></div>
 <body>
@@ -577,15 +578,16 @@
             btnSalvarFechar = document.createElement('button');
             btnSalvarFechar.id = 'btnSalvarFechar';
             btnSalvarFechar.textContent = 'Salvar e Fechar';
-            btnSalvarFechar.style.margin = '16px 0 8px 20px';
+            btnSalvarFechar.style.margin = '0';
             btnSalvarFechar.style.padding = '8px 18px';
             btnSalvarFechar.style.fontSize = '15px';
             btnSalvarFechar.style.border = 'none';
             btnSalvarFechar.style.borderRadius = '6px';
-            btnSalvarFechar.style.background = '#61bd4f';
+            btnSalvarFechar.style.background = '#28a745';
             btnSalvarFechar.style.color = '#fff';
             btnSalvarFechar.style.fontWeight = 'bold';
             btnSalvarFechar.style.cursor = 'pointer';
+            btnSalvarFechar.style.transition = 'background 0.2s';
             btnSalvarFechar.onclick = async function() {
               btnSalvarFechar.disabled = true;
               btnSalvarFechar.textContent = 'Salvando...';
@@ -618,7 +620,8 @@
               btnSalvarFechar.remove();
               if (erro) alert('Alguns pedidos não foram salvos.');
             };
-            btnEditarPedidos.parentNode.insertBefore(btnSalvarFechar, btnEditarPedidos.nextSibling);
+            const btnContainer = document.getElementById('btnContainer');
+            btnContainer.appendChild(btnSalvarFechar);
           }
         }
 
