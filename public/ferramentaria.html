@@ -204,7 +204,6 @@
     <h2>Ferramentaria</h2>
     <div style="max-width: 1000px; margin: 0 auto 18px auto; display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
       <button id="btnNovo" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #28a745; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s;">Novo</button>
-      <button id="btnEditar" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s;">Editar</button>
     </div>
     <div style="overflow-x:auto; margin-top: 24px;">
       <table class="ferramentaria-table" id="tabelaFerramentaria">
@@ -238,8 +237,6 @@
 
     // Adiciona funcionalidade ao botão Novo
     document.getElementById('btnNovo').addEventListener('click', function() {
-      const btnEditar = document.getElementById('btnEditar');
-      if (btnEditar) btnEditar.style.display = 'none';
       const tabela = document.getElementById('tabelaFerramentaria').getElementsByTagName('tbody')[0];
       // Evita múltiplas linhas abertas
       if (document.getElementById('linhaNova')) return;
@@ -339,7 +336,7 @@
               btnFecharObs.onclick = () => modal.remove();
               btnSalvarObs.onclick = () => {
                 btnObs.dataset.obs = textarea.value;
-                btnObs.textContent = textarea.value ? 'Obs adicionada' : 'Adicionar Obs';
+                btnObs.textContent = textarea.value ? 'Ok' : 'Adicionar Obs';
                 modal.remove();
               };
             }
@@ -389,6 +386,17 @@
             select.appendChild(option);
           });
           td.appendChild(select);
+        } else if (campo === 'abertura') {
+          let input = document.createElement('input');
+          input.type = 'date';
+          input.style.width = '100%';
+          input.style.padding = '6px';
+          input.style.fontSize = '14px';
+          input.style.boxSizing = 'border-box';
+          input.disabled = true;
+          const hoje = new Date();
+          input.value = hoje.toISOString().slice(0, 10);
+          td.appendChild(input);
         } else {
           let input = document.createElement('input');
           input.type = 'text';
@@ -464,15 +472,86 @@
           }
         });
         // Substitui a linha de inputs por uma linha de texto
-        linha.innerHTML = valores.map(v => `<td>${v}</td>`).join('');
+        linha.innerHTML = valores.map((v, idx) => {
+          if (idx === 4) {
+            // Obs: botão Abrir
+            return `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:#ffc107;color:#222;font-weight:bold;cursor:pointer;'>Abrir</button></td>`;
+          }
+          return `<td>${v}</td>`;
+        }).join('');
         linha.id = '';
         containerSalvar.innerHTML = '';
-        if (btnEditar) btnEditar.style.display = '';
+        // Adiciona evento ao botão Abrir Obs
+        const btnAbrirObs = linha.querySelector('.btnAbrirObs');
+        if (btnAbrirObs) {
+          btnAbrirObs.addEventListener('click', function() {
+            let modal = document.getElementById('modalObs');
+            if (!modal) {
+              modal = document.createElement('div');
+              modal.id = 'modalObs';
+              modal.style.position = 'fixed';
+              modal.style.top = '0';
+              modal.style.left = '0';
+              modal.style.width = '100vw';
+              modal.style.height = '100vh';
+              modal.style.background = 'rgba(0,0,0,0.3)';
+              modal.style.display = 'flex';
+              modal.style.alignItems = 'center';
+              modal.style.justifyContent = 'center';
+              modal.style.zIndex = '9999';
+              const box = document.createElement('div');
+              box.style.background = '#fff';
+              box.style.borderRadius = '12px';
+              box.style.padding = '24px';
+              box.style.boxShadow = '0 2px 16px rgba(0,0,0,0.18)';
+              box.style.minWidth = '540px';
+              box.style.maxWidth = '98vw';
+              box.style.display = 'flex';
+              box.style.flexDirection = 'column';
+              box.style.gap = '16px';
+              const label = document.createElement('label');
+              label.textContent = 'Observação:';
+              label.style.fontWeight = 'bold';
+              label.style.marginBottom = '8px';
+              const textoObs = document.createElement('div');
+              textoObs.style.width = '100%';
+              textoObs.style.minHeight = '120px';
+              textoObs.style.fontSize = '15px';
+              textoObs.style.padding = '8px';
+              textoObs.style.borderRadius = '6px';
+              textoObs.style.border = '1px solid #ccc';
+              textoObs.style.background = '#f8f9fa';
+              textoObs.style.whiteSpace = 'pre-wrap';
+              textoObs.textContent = valores[4];
+              const btnFecharObs = document.createElement('button');
+              btnFecharObs.textContent = 'Fechar';
+              btnFecharObs.style.padding = '8px 18px';
+              btnFecharObs.style.fontSize = '15px';
+              btnFecharObs.style.border = 'none';
+              btnFecharObs.style.borderRadius = '6px';
+              btnFecharObs.style.background = '#dc3545';
+              btnFecharObs.style.color = '#fff';
+              btnFecharObs.style.fontWeight = 'bold';
+              btnFecharObs.style.cursor = 'pointer';
+              btnFecharObs.style.transition = 'background 0.2s';
+              btnFecharObs.style.marginLeft = '10px';
+              const btns = document.createElement('div');
+              btns.style.display = 'flex';
+              btns.style.justifyContent = 'flex-end';
+              btns.appendChild(btnFecharObs);
+              box.appendChild(label);
+              box.appendChild(textoObs);
+              box.appendChild(btns);
+              modal.appendChild(box);
+              document.body.appendChild(modal);
+              btnFecharObs.onclick = () => modal.remove();
+            }
+          });
+        }
       });
       btnCancelar.addEventListener('click', function() {
         linha.remove();
         containerSalvar.innerHTML = '';
-        if (btnEditar) btnEditar.style.display = '';
       });
     });
   </script>
