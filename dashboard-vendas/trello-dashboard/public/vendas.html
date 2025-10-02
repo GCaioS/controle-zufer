@@ -269,6 +269,7 @@
           highlightIndex = cards.findIndex(card => {
             let codigo = '';
             let descricao = '';
+            let pedido = '';
             if (card.name) {
               const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
               if (match) {
@@ -279,9 +280,13 @@
                 descricao = '';
               }
             }
+            if (card.customFields && card.customFields['N° Pedido']) {
+              pedido = String(card.customFields['N° Pedido']).toLowerCase();
+            }
             return (
               (codigo && codigo.toLowerCase().includes(searchValue)) ||
-              (descricao && descricao.toLowerCase().includes(searchValue))
+              (descricao && descricao.toLowerCase().includes(searchValue)) ||
+              (pedido && pedido.includes(searchValue))
             );
           });
           window._searchTrigger = false;
@@ -297,7 +302,7 @@
   table.style.background = '#fff';
   table.style.borderCollapse = 'collapse';
   table.style.boxShadow = '0 2px 8px rgba(0,0,0,0.07)';
-  table.style.borderRadius = '16px';
+  table.style.borderRadius = '12px';
   table.style.overflow = 'hidden';
 
         const thead = document.createElement('thead');
@@ -534,6 +539,7 @@
       const matches = allCardsCache.filter(card => {
         let codigo = '';
         let descricao = '';
+        let pedido = '';
         if (card.name) {
           const match = card.name.match(/^([A-Z0-9.\-/]+)\s+(.+)$/i);
           if (match) {
@@ -544,9 +550,13 @@
             descricao = '';
           }
         }
+        if (card.customFields && card.customFields['N° Pedido']) {
+          pedido = String(card.customFields['N° Pedido']).toLowerCase();
+        }
         return (
           (codigo && codigo.toLowerCase().includes(value)) ||
-          (descricao && descricao.toLowerCase().includes(value))
+          (descricao && descricao.toLowerCase().includes(value)) ||
+          (pedido && pedido.includes(value))
         );
       }).slice(0, 8);
       if (matches.length === 0) {
