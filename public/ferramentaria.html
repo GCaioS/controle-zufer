@@ -442,44 +442,43 @@
       btnCancelar.style.marginLeft = '10px';
       containerSalvar.appendChild(btnCancelar);
       btnSalvar.addEventListener('click', function() {
-        // Corrige coleta dos valores
-        const valores = [];
+        // Captura os valores dos campos
+        const campos = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'status'];
+        const dados = {};
         linha.childNodes.forEach((td, idx) => {
-          // Obs
-          if (idx === 4) {
+          if (campos[idx] === 'obs') {
             const btnObs = td.querySelector('button');
-            valores.push(btnObs ? (btnObs.dataset.obs || '') : '');
-          }
-          // Setor Solicitante
-          else if (idx === 5) {
+            dados[campos[idx]] = btnObs ? (btnObs.dataset.obs || '') : '';
+          } else if (campos[idx] === 'setor' || campos[idx] === 'status') {
             const select = td.querySelector('select');
-            valores.push(select ? select.value : '');
-          }
-          // Data Limite Entrega
-          else if (idx === 6) {
+            dados[campos[idx]] = select ? select.value : '';
+          } else if (campos[idx] === 'limite' || campos[idx] === 'abertura') {
             const input = td.querySelector('input[type="date"]');
-            valores.push(input ? input.value : '');
-          }
-          // Status
-          else if (idx === 7) {
-            const select = td.querySelector('select');
-            valores.push(select ? select.value : '');
-          }
-          // Demais campos
-          else {
+            dados[campos[idx]] = input ? input.value : '';
+          } else {
             const input = td.querySelector('input');
-            valores.push(input ? input.value : '');
+            dados[campos[idx]] = input ? input.value : '';
           }
         });
-        // Exibe os dados capturados em um alert
-        alert('Dados inseridos:\n' + JSON.stringify(valores, null, 2));
+        // Envia os dados para o backend
+        fetch('/api/ferramentaria', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        })
+        .then(res => res.json())
+        .then(json => {
+          alert(json.message || 'Salvo com sucesso!');
+        })
+        .catch(() => {
+          alert('Erro ao salvar!');
+        });
         // Substitui a linha de inputs por uma linha de texto
-        linha.innerHTML = valores.map((v, idx) => {
-          if (idx === 4) {
-            // Obs: botão Abrir
+        linha.innerHTML = campos.map((campo, idx) => {
+          if (campo === 'obs') {
             return `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:#ffc107;color:#222;font-weight:bold;cursor:pointer;'>Abrir</button></td>`;
           }
-          return `<td>${v}</td>`;
+          return `<td>${dados[campo]}</td>`;
         }).join('');
         linha.id = '';
         containerSalvar.innerHTML = '';

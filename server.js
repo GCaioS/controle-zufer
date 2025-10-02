@@ -11,7 +11,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+const fs = require('fs');
 const { TRELLO_KEY, TRELLO_TOKEN, PORT } = process.env;
+// Endpoint para salvar dados da ferramentaria
+app.post('/api/ferramentaria', (req, res) => {
+  const novoRegistro = req.body;
+  const filePath = path.join(__dirname, 'data', 'ferramentaria.json');
+  let registros = [];
+  if (fs.existsSync(filePath)) {
+    try {
+      registros = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (e) {
+      registros = [];
+    }
+  }
+  registros.push(novoRegistro);
+  fs.writeFileSync(filePath, JSON.stringify(registros, null, 2));
+  res.status(200).json({ message: 'Salvo com sucesso!' });
+});
 
 app.get('/cards/:boardId', async (req, res) => {
   const boardId = req.params.boardId;
