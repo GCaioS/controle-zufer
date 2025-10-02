@@ -445,10 +445,27 @@
               const fimSpan = document.createElement('span');
               fimSpan.textContent = dataFim;
               fimSpan.style.border = '2px solid #8fd19e';
-              fimSpan.style.background = '#eafbe5';
               fimSpan.style.borderRadius = '6px';
               fimSpan.style.padding = '2px 10px';
               fimSpan.style.fontWeight = 'bold';
+
+              // Lógica de cor do fundo para data de Fim
+              let corFundoFim = '#eafbe5'; // verde claro padrão
+              if (card.dueDate) {
+                const hoje = new Date();
+                hoje.setHours(0,0,0,0);
+                const fimDate = new Date(card.dueDate);
+                fimDate.setHours(0,0,0,0);
+                const diffDias = Math.floor((fimDate - hoje) / (1000*60*60*24));
+                if (diffDias === 0) {
+                  corFundoFim = '#ffd6d6'; // vermelho claro
+                  fimSpan.style.border = '2px solid #e57373';
+                } else if (diffDias === 1) {
+                  corFundoFim = '#fff9c4'; // amarelo claro
+                  fimSpan.style.border = '2px solid #ffe082';
+                }
+              }
+              fimSpan.style.background = corFundoFim;
 
               datasDiv.appendChild(inicioLabel);
               datasDiv.appendChild(inicioSpan);
