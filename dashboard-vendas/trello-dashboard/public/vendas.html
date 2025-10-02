@@ -200,7 +200,7 @@
   <div style="margin-top: 30px; margin-bottom: 8px;">
     <h2 style="margin: 0 0 0 8px;">Acompanhamento de Pedidos</h2>
   </div>
-  <div id="btnContainer" style="max-width: 1100px; margin: 0 auto 18px auto; display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+  <div id="btnContainer" style="max-width: 1100px; margin: 0 auto 18px auto; display: flex; justify-content: flex-end, align-items: center; gap: 12px;">
     <button id="btnEditarPedidos" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s;">Editar Pedidos</button>
     <!-- O botão 'Salvar e Fechar' será inserido dinamicamente, mas já estilizamos via JS -->
   </div>
@@ -631,20 +631,28 @@
               for (const item of editInputs) {
                 const { cardId, input, tdPedido, tdEntregaPed, original, field } = item;
                 let novoValor = input.value.trim();
-                // Se for campo de data, converte para o formato ISO 8601 completo (yyyy-MM-ddTHH:mm:ss.sssZ)
+                // Só salva se o valor foi alterado
+                if (novoValor === original) {
+                  // Apenas restaura o valor na célula
+                  if (field === 'N° Pedido') {
+                    tdPedido.textContent = original;
+                  } else if (field === 'Entrega Pedido') {
+                    tdEntregaPed.textContent = original;
+                  }
+                  continue;
+                }
+                // Se for campo de data (agora texto), não converte, apenas envia o valor digitado
                 if (field === 'Entrega Pedido') {
-                  const brMatch = novoValor.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-                  if (brMatch) {
-                    // Cria objeto Date e converte para ISO 8601
-                    const dateObj = new Date(`${brMatch[3]}-${brMatch[2]}-${brMatch[1]}T00:00:00.000Z`);
-                    novoValor = dateObj.toISOString();
-                  }
-                  // Se vier só yyyy-mm-dd, também converte para ISO 8601
-                  const isoMatch = novoValor.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-                  if (isoMatch) {
-                    const dateObj = new Date(`${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}T00:00:00.000Z`);
-                    novoValor = dateObj.toISOString();
-                  }
+                  let fieldId = idCampoEntrega;
+                  if (!fieldId) throw new Error('Campo "Entrega Pedido" não encontrado');
+                  const res = await fetch('/update-custom-field', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cardId, fieldId, value: novoValor })
+                  });
+                  if (!res.ok) throw new Error('Falha ao atualizar');
+                  tdEntregaPed.textContent = novoValor;
+                  continue;
                 }
                 if (novoValor !== original) {
                   try {
