@@ -198,6 +198,7 @@
     </div>
   </div>
   <h2 style="margin-top: 30px; margin-left: 20px;">Acompanhamento de Pedidos</h2>
+  <button id="btnEditarPedidos" style="margin: 16px 0 8px 20px; padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #0079bf; color: #fff; font-weight: bold; cursor: pointer;">Editar Pedidos</button>
   <div id="dashboard"></div>
 <body>
 
@@ -240,10 +241,23 @@
 
     async function loadCards() {
       const boardId = 'eBApBIzf';
+      let idCampoPedido = null;
       try {
         const res = await fetch(`/cards/${boardId}`);
         if (!res.ok) throw new Error('Erro ao carregar cards');
         let cards = await res.json();
+        // Descobre o id do campo personalizado 'N° Pedido' após carregar os cards
+        if (cards.length > 0 && cards[0].customFields) {
+          for (const key in cards[0].customFields) {
+            if (key.toLowerCase().includes('pedido')) {
+              const customFieldItem = (cards[0].customFieldItems || []).find(i => i.value?.text === cards[0].customFields[key] || i.value?.number === cards[0].customFields[key]);
+              if (customFieldItem) {
+                idCampoPedido = customFieldItem.idCustomField;
+                break;
+              }
+            }
+          }
+        }
         // Ordena: 'Ferramentaria' primeiro, depois 'Em andamento'
         cards.sort((a, b) => {
           function isFerramentaria(card) {
@@ -353,12 +367,10 @@
           // Se tiver etiqueta Ferramentaria, pinta todas as células da linha de vermelho forte
           const isFerramentaria = Array.isArray(card.labels) && card.labels.some(l => l.name && l.name.trim().toLowerCase() === 'ferramentaria');
 
-          // Remove destaque anterior
           document.querySelectorAll('#dashboard table tbody tr').forEach(row => {
             row.classList.remove('highlight');
           });
 
-          // Adiciona destaque na linha encontrada
           if (highlightIndex === i) {
             tr.classList.add('highlight');
             tr.setAttribute('tabindex', '-1');
@@ -402,6 +414,8 @@
           tdPedido.style.width = '110px';
           tdPedido.style.minWidth = '80px';
           styleCell(tdPedido);
+          tdPedido.dataset.cardId = card.id;
+          tdPedido.dataset.rowIndex = i;
           tr.appendChild(tdPedido);
 
           const tdCodigo = document.createElement('td');
@@ -518,14 +532,68 @@
           tr.appendChild(tdEntregaPed);
 
           tbody.appendChild(tr);
-          // Após adicionar todas as células, pinta se for Ferramentaria
           if (isFerramentaria) {
             Array.from(tr.children).forEach(td => {
-              td.style.background = '#ffdddd'; // vermelho mais leve
+              td.style.background = '#ffdddd';
               td.style.color = '#222';
             });
           }
         });
+
+        // Função para ativar edição
+        function ativarEdicaoPedidos() {
+          const tdPedidos = document.querySelectorAll('#dashboard table tbody td[data-card-id]');
+          tdPedidos.forEach(tdPedido => {
+            const cardId = tdPedido.dataset.cardId;
+            const pedidoAtual = tdPedido.textContent;
+            tdPedido.innerHTML = '';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = pedidoAtual;
+            input.style.width = '80px';
+            input.style.padding = '4px';
+            input.style.fontSize = '14px';
+            input.style.textAlign = 'center';
+            tdPedido.appendChild(input);
+            const btnSalvar = document.createElement('button');
+            btnSalvar.textContent = 'Salvar';
+            btnSalvar.style.marginLeft = '6px';
+            btnSalvar.style.padding = '4px 10px';
+            btnSalvar.style.fontSize = '13px';
+            btnSalvar.style.borderRadius = '6px';
+            btnSalvar.style.border = 'none';
+            btnSalvar.style.background = '#61bd4f';
+            btnSalvar.style.color = '#fff';
+            btnSalvar.style.cursor = 'pointer';
+            btnSalvar.addEventListener('click', async function() {
+              const novoPedido = input.value.trim();
+              btnSalvar.disabled = true;
+              btnSalvar.textContent = 'Salvando...';
+              try {
+                if (!idCampoPedido) throw new Error('Campo "N° Pedido" não encontrado');
+                const res = await fetch('/update-custom-field', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ cardId, fieldId: idCampoPedido, value: novoPedido })
+                });
+                if (!res.ok) throw new Error('Falha ao atualizar');
+                tdPedido.textContent = novoPedido;
+              } catch (err) {
+                alert('Erro ao salvar: ' + (err.message || err));
+              } finally {
+                btnSalvar.disabled = false;
+                btnSalvar.textContent = 'Salvar';
+              }
+            });
+            tdPedido.appendChild(btnSalvar);
+          });
+        }
+
+        // Evento do botão fora da tabela
+        const btnEditarPedidos = document.getElementById('btnEditarPedidos');
+        if (btnEditarPedidos) {
+          btnEditarPedidos.onclick = ativarEdicaoPedidos;
+        }
         table.appendChild(tbody);
         dashboard.appendChild(table);
 
