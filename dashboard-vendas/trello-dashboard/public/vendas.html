@@ -461,10 +461,12 @@
           tdLabels.style.overflow = 'hidden';
           tdLabels.style.whiteSpace = 'nowrap';
           tdLabels.style.textOverflow = 'ellipsis';
+          tdLabels.style.textAlign = 'center';
           if (Array.isArray(card.labels) && card.labels.length > 0) {
             const labelsDiv = document.createElement('div');
             labelsDiv.style.display = 'flex';
             labelsDiv.style.gap = '8px';
+            labelsDiv.style.justifyContent = 'center';
             // Prioriza Ferramentaria
             let labelFerramentaria = card.labels.find(l => l.name && l.name.trim().toLowerCase() === 'ferramentaria');
             let labelEmAndamento = card.labels.find(l => l.name && l.name.trim().toLowerCase() === 'em andamento');
