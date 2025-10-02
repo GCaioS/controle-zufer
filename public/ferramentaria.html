@@ -246,14 +246,112 @@
       const campos = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'status'];
       campos.forEach((campo, idx) => {
         const td = document.createElement('td');
-        let input = document.createElement('input');
-        input.type = 'text';
-        input.style.width = '100%';
-        input.style.padding = '6px';
-        input.style.fontSize = '14px';
-        input.style.boxSizing = 'border-box';
-        input.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
-        td.appendChild(input);
+        if (campo === 'obs') {
+          // Botão para abrir bloco de notas
+          const btnObs = document.createElement('button');
+          btnObs.textContent = 'Adicionar Obs';
+          btnObs.style.padding = '6px 12px';
+          btnObs.style.fontSize = '14px';
+          btnObs.style.border = 'none';
+          btnObs.style.borderRadius = '6px';
+          btnObs.style.background = '#ffc107';
+          btnObs.style.color = '#222';
+          btnObs.style.fontWeight = 'bold';
+          btnObs.style.cursor = 'pointer';
+          btnObs.style.transition = 'background 0.2s';
+          td.appendChild(btnObs);
+          // Modal bloco de notas
+          btnObs.addEventListener('click', function() {
+            let modal = document.getElementById('modalObs');
+            if (!modal) {
+              modal = document.createElement('div');
+              modal.id = 'modalObs';
+              modal.style.position = 'fixed';
+              modal.style.top = '0';
+              modal.style.left = '0';
+              modal.style.width = '100vw';
+              modal.style.height = '100vh';
+              modal.style.background = 'rgba(0,0,0,0.3)';
+              modal.style.display = 'flex';
+              modal.style.alignItems = 'center';
+              modal.style.justifyContent = 'center';
+              modal.style.zIndex = '9999';
+              // Conteúdo do modal
+              const box = document.createElement('div');
+              box.style.background = '#fff';
+              box.style.borderRadius = '12px';
+              box.style.padding = '24px';
+              box.style.boxShadow = '0 2px 16px rgba(0,0,0,0.18)';
+              box.style.minWidth = '540px';
+              box.style.maxWidth = '98vw';
+              box.style.display = 'flex';
+              box.style.flexDirection = 'column';
+              box.style.gap = '16px';
+              const label = document.createElement('label');
+              label.textContent = 'Observação:';
+              label.style.fontWeight = 'bold';
+              label.style.marginBottom = '8px';
+              const textarea = document.createElement('textarea');
+              textarea.style.width = '100%';
+              textarea.style.height = '220px';
+              textarea.style.fontSize = '15px';
+              textarea.style.padding = '8px';
+              textarea.style.borderRadius = '6px';
+              textarea.style.border = '1px solid #ccc';
+              textarea.style.resize = 'vertical';
+              textarea.value = btnObs.dataset.obs || '';
+              const btnSalvarObs = document.createElement('button');
+              btnSalvarObs.textContent = 'Salvar Obs';
+              btnSalvarObs.style.padding = '8px 18px';
+              btnSalvarObs.style.fontSize = '15px';
+              btnSalvarObs.style.border = 'none';
+              btnSalvarObs.style.borderRadius = '6px';
+              btnSalvarObs.style.background = '#007bff';
+              btnSalvarObs.style.color = '#fff';
+              btnSalvarObs.style.fontWeight = 'bold';
+              btnSalvarObs.style.cursor = 'pointer';
+              btnSalvarObs.style.transition = 'background 0.2s';
+              btnSalvarObs.style.marginRight = '10px';
+              const btnFecharObs = document.createElement('button');
+              btnFecharObs.textContent = 'Fechar';
+              btnFecharObs.style.padding = '8px 18px';
+              btnFecharObs.style.fontSize = '15px';
+              btnFecharObs.style.border = 'none';
+              btnFecharObs.style.borderRadius = '6px';
+              btnFecharObs.style.background = '#dc3545';
+              btnFecharObs.style.color = '#fff';
+              btnFecharObs.style.fontWeight = 'bold';
+              btnFecharObs.style.cursor = 'pointer';
+              btnFecharObs.style.transition = 'background 0.2s';
+              btnFecharObs.style.marginLeft = '10px';
+              const btns = document.createElement('div');
+              btns.style.display = 'flex';
+              btns.style.justifyContent = 'flex-end';
+              btns.appendChild(btnSalvarObs);
+              btns.appendChild(btnFecharObs);
+              box.appendChild(label);
+              box.appendChild(textarea);
+              box.appendChild(btns);
+              modal.appendChild(box);
+              document.body.appendChild(modal);
+              btnFecharObs.onclick = () => modal.remove();
+              btnSalvarObs.onclick = () => {
+                btnObs.dataset.obs = textarea.value;
+                btnObs.textContent = textarea.value ? 'Obs adicionada' : 'Adicionar Obs';
+                modal.remove();
+              };
+            }
+          });
+        } else {
+          let input = document.createElement('input');
+          input.type = 'text';
+          input.style.width = '100%';
+          input.style.padding = '6px';
+          input.style.fontSize = '14px';
+          input.style.boxSizing = 'border-box';
+          input.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+          td.appendChild(input);
+        }
         linha.appendChild(td);
       });
       tabela.appendChild(linha);
@@ -273,6 +371,21 @@
       btnSalvar.style.cursor = 'pointer';
       btnSalvar.style.transition = 'background 0.2s';
       containerSalvar.appendChild(btnSalvar);
+      // Botão cancelar
+      const btnCancelar = document.createElement('button');
+      btnCancelar.id = 'btnCancelar';
+      btnCancelar.textContent = 'Cancelar';
+      btnCancelar.style.padding = '8px 18px';
+      btnCancelar.style.fontSize = '15px';
+      btnCancelar.style.border = 'none';
+      btnCancelar.style.borderRadius = '6px';
+      btnCancelar.style.background = '#dc3545';
+      btnCancelar.style.color = '#fff';
+      btnCancelar.style.fontWeight = 'bold';
+      btnCancelar.style.cursor = 'pointer';
+      btnCancelar.style.transition = 'background 0.2s';
+      btnCancelar.style.marginLeft = '10px';
+      containerSalvar.appendChild(btnCancelar);
       btnSalvar.addEventListener('click', function() {
         // Aqui você pode implementar a lógica de salvar os dados
         // Exemplo: pegar os valores dos inputs
@@ -280,6 +393,10 @@
         // Substitui a linha de inputs por uma linha de texto
         linha.innerHTML = valores.map(v => `<td>${v}</td>`).join('');
         linha.id = '';
+        containerSalvar.innerHTML = '';
+      });
+      btnCancelar.addEventListener('click', function() {
+        linha.remove();
         containerSalvar.innerHTML = '';
       });
     });
