@@ -341,8 +341,8 @@
               // Exibe OP e Ciclo acima das etiquetas
               if (card.customFields) {
                 const topFieldsDiv = document.createElement('div');
-                  topFieldsDiv.className = 'campos-destaque';
-                topFieldsDiv.style.marginBottom = '20px';
+                topFieldsDiv.className = 'campos-destaque';
+                topFieldsDiv.style.marginBottom = '25px';
                 ['OP', 'Ciclo'].forEach(campo => {
                   const fieldDiv = document.createElement('div');
                   let valor = card.customFields[campo];
@@ -394,6 +394,18 @@
                     customFieldsDiv.appendChild(fieldDiv);
                   });
                 });
+
+                // Adiciona datas de início e término abaixo dos campos personalizados
+                const dataInicio = card.startDate ? new Date(card.startDate).toLocaleDateString('pt-BR') : 'N/A';
+                const dataFim = card.dueDate ? new Date(card.dueDate).toLocaleDateString('pt-BR') : 'N/A';
+                const dataInicioDiv = document.createElement('div');
+                dataInicioDiv.textContent = `Início: ${dataInicio}`;
+                dataInicioDiv.style.marginTop = '12px';
+                customFieldsDiv.appendChild(dataInicioDiv);
+                const dataFimDiv = document.createElement('div');
+                dataFimDiv.textContent = `Término: ${dataFim}`;
+                customFieldsDiv.appendChild(dataFimDiv);
+
                 cardDiv.appendChild(customFieldsDiv);
               }
 
