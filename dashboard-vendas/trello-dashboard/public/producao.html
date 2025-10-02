@@ -369,20 +369,20 @@
           .sort((a,b) => parseInt(a.replace(/\D/g,''),10) - parseInt(b.replace(/\D/g,''),10));
 
   // Layout: quantidade de listas por linha
-  const layout = [5,5,5,5,4];
+  const layout = [5,5,5,5,5];
   let index = 0;
 
   layout.forEach((count, rowIdx) => {
     const rowDiv = document.createElement('div');
     rowDiv.className = 'dashboard-row';
 
-    // Última linha: INJ 21, INJ 22, vazio, vazio
+    // Última linha: INJ 21, INJ 22, vazio, vazio, vazio
     if (rowIdx === layout.length - 1) {
       // Busca INJ 21 e INJ 22
       const inj21 = sortedListNames.find(n => n.replace(/\D/g, '') === '21');
       const inj22 = sortedListNames.find(n => n.replace(/\D/g, '') === '22');
       const nomes = [inj21, inj22];
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 5; i++) {
         const listaDiv = document.createElement('div');
         listaDiv.className = 'lista';
         if (i < 2 && nomes[i]) {
