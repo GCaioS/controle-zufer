@@ -434,17 +434,22 @@
             labelsDiv.style.gap = '8px';
             // Prioriza Ferramentaria
             let labelFerramentaria = card.labels.find(l => l.name && l.name.trim().toLowerCase() === 'ferramentaria');
+            let labelEmAndamento = card.labels.find(l => l.name && l.name.trim().toLowerCase() === 'em andamento');
             let labelsToShow = [];
             if (labelFerramentaria) {
               labelsToShow = [labelFerramentaria];
+            } else if (labelEmAndamento) {
+              // Se houver Em andamento junto com outras, mostra só Em andamento
+              labelsToShow = [labelEmAndamento];
             } else {
               labelsToShow = card.labels;
             }
             labelsToShow.forEach(l => {
               const span = document.createElement('span');
               span.textContent = (l.name && l.name.trim().toLowerCase() === 'próximo') ? 'Iniciar' : (l.name || '');
-              // Se for Ferramentaria, força vermelho
-              if (l.name && l.name.trim().toLowerCase() === 'ferramentaria') {
+              // Se for Ferramentaria ou Urgente, força vermelho
+              const labelName = l.name ? l.name.trim().toLowerCase() : '';
+              if (labelName === 'ferramentaria' || labelName === 'urgente') {
                 span.style.background = labelColors['red'];
               } else {
                 span.style.background = labelColors[l.color] || '#888';
