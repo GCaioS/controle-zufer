@@ -372,9 +372,11 @@
               titleDiv.textContent = escapeHtml(card.name);
               cardDiv.appendChild(titleDiv);
 
+
               // Exibe os demais campos personalizados
+              let customFieldsDiv = null;
               if (card.customFields && Object.keys(card.customFields).length > 0) {
-                const customFieldsDiv = document.createElement('div');
+                customFieldsDiv = document.createElement('div');
                 customFieldsDiv.className = 'campos-personalizados';
                 customFieldsDiv.style.marginTop = '25px';
                 // Ordem e agrupamento dos campos (exceto OP e Ciclo)
@@ -394,20 +396,65 @@
                     customFieldsDiv.appendChild(fieldDiv);
                   });
                 });
-
-                // Adiciona datas de início e término abaixo dos campos personalizados
-                const dataInicio = card.startDate ? new Date(card.startDate).toLocaleDateString('pt-BR') : 'N/A';
-                const dataFim = card.dueDate ? new Date(card.dueDate).toLocaleDateString('pt-BR') : 'N/A';
-                const dataInicioDiv = document.createElement('div');
-                dataInicioDiv.textContent = `Início: ${dataInicio}`;
-                dataInicioDiv.style.marginTop = '12px';
-                customFieldsDiv.appendChild(dataInicioDiv);
-                const dataFimDiv = document.createElement('div');
-                dataFimDiv.textContent = `Término: ${dataFim}`;
-                customFieldsDiv.appendChild(dataFimDiv);
-
                 cardDiv.appendChild(customFieldsDiv);
               }
+
+              // Adiciona datas de início e término abaixo da área dos campos personalizados
+              function abreviarAno(dataStr) {
+                if (!dataStr || dataStr === 'N/A') return dataStr;
+                const partes = dataStr.split('/');
+                if (partes.length === 3) {
+                  partes[2] = partes[2].slice(-2);
+                  return partes.join('/');
+                }
+                return dataStr;
+              }
+              const dataInicio = card.startDate ? abreviarAno(new Date(card.startDate).toLocaleDateString('pt-BR')) : 'N/A';
+              const dataFim = card.dueDate ? abreviarAno(new Date(card.dueDate).toLocaleDateString('pt-BR')) : 'N/A';
+              const datasDiv = document.createElement('div');
+              datasDiv.style.marginTop = '12px';
+              datasDiv.style.fontSize = '14px';
+              datasDiv.style.color = '#333';
+              datasDiv.style.display = 'flex';
+              datasDiv.style.gap = '10px';
+              datasDiv.style.alignItems = 'center';
+
+              // Label de início
+              const inicioLabel = document.createElement('span');
+              inicioLabel.textContent = 'Inic:';
+              inicioLabel.style.marginRight = '4px';
+              inicioLabel.style.fontWeight = 'normal';
+
+              // Valor destacado
+              const inicioSpan = document.createElement('span');
+              inicioSpan.textContent = dataInicio;
+              inicioSpan.style.border = '2px solid #8fd19e';
+              inicioSpan.style.background = '#eafbe5';
+              inicioSpan.style.borderRadius = '6px';
+              inicioSpan.style.padding = '2px 10px';
+              inicioSpan.style.fontWeight = 'bold';
+
+              // Label de término
+              const fimLabel = document.createElement('span');
+              fimLabel.textContent = 'Fim:';
+              fimLabel.style.marginLeft = '12px';
+              fimLabel.style.marginRight = '4px';
+              fimLabel.style.fontWeight = 'normal';
+
+              // Valor destacado
+              const fimSpan = document.createElement('span');
+              fimSpan.textContent = dataFim;
+              fimSpan.style.border = '2px solid #8fd19e';
+              fimSpan.style.background = '#eafbe5';
+              fimSpan.style.borderRadius = '6px';
+              fimSpan.style.padding = '2px 10px';
+              fimSpan.style.fontWeight = 'bold';
+
+              datasDiv.appendChild(inicioLabel);
+              datasDiv.appendChild(inicioSpan);
+              datasDiv.appendChild(fimLabel);
+              datasDiv.appendChild(fimSpan);
+              cardDiv.appendChild(datasDiv);
 
               listaDiv.appendChild(cardDiv);
             });
