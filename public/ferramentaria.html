@@ -502,6 +502,7 @@
                   label.textContent = 'Revisão:';
                   label.style.fontWeight = 'bold';
                   label.style.marginBottom = '8px';
+                  // Conteúdo editável
                   const textoRevisao = document.createElement('div');
                   textoRevisao.style.width = '100%';
                   textoRevisao.style.minHeight = '120px';
@@ -512,6 +513,34 @@
                   textoRevisao.style.background = '#f8f9fa';
                   textoRevisao.style.whiteSpace = 'pre-wrap';
                   textoRevisao.textContent = dados.revisao || '';
+                  // Botão editar
+                  const btnEditar = document.createElement('button');
+                  btnEditar.textContent = 'Editar';
+                  btnEditar.style.padding = '8px 18px';
+                  btnEditar.style.fontSize = '15px';
+                  btnEditar.style.border = 'none';
+                  btnEditar.style.borderRadius = '6px';
+                  btnEditar.style.background = '#007bff';
+                  btnEditar.style.color = '#fff';
+                  btnEditar.style.fontWeight = 'bold';
+                  btnEditar.style.cursor = 'pointer';
+                  btnEditar.style.transition = 'background 0.2s';
+                  btnEditar.style.marginRight = '10px';
+                  // Botão salvar (inicialmente oculto)
+                  const btnSalvar = document.createElement('button');
+                  btnSalvar.textContent = 'Salvar';
+                  btnSalvar.style.padding = '8px 18px';
+                  btnSalvar.style.fontSize = '15px';
+                  btnSalvar.style.border = 'none';
+                  btnSalvar.style.borderRadius = '6px';
+                  btnSalvar.style.background = '#28a745';
+                  btnSalvar.style.color = '#fff';
+                  btnSalvar.style.fontWeight = 'bold';
+                  btnSalvar.style.cursor = 'pointer';
+                  btnSalvar.style.transition = 'background 0.2s';
+                  btnSalvar.style.marginRight = '10px';
+                  btnSalvar.style.display = 'none';
+                  // Botão fechar
                   const btnFecharRevisao = document.createElement('button');
                   btnFecharRevisao.textContent = 'Fechar';
                   btnFecharRevisao.style.padding = '8px 18px';
@@ -524,9 +553,62 @@
                   btnFecharRevisao.style.cursor = 'pointer';
                   btnFecharRevisao.style.transition = 'background 0.2s';
                   btnFecharRevisao.style.marginLeft = '10px';
+                  // Editar: transforma div em textarea
+                  btnEditar.onclick = function() {
+                    const textarea = document.createElement('textarea');
+                    textarea.style.width = '100%';
+                    textarea.style.height = '120px';
+                    textarea.style.fontSize = '15px';
+                    textarea.style.padding = '8px';
+                    textarea.style.borderRadius = '6px';
+                    textarea.style.border = '1px solid #ccc';
+                    textarea.style.resize = 'vertical';
+                    textarea.value = textoRevisao.textContent;
+                    box.replaceChild(textarea, textoRevisao);
+                    btnEditar.style.display = 'none';
+                    btnSalvar.style.display = '';
+                    btnSalvar.onclick = function() {
+                      // Atualiza valor na tabela
+                      textoRevisao.textContent = textarea.value;
+                      box.replaceChild(textoRevisao, textarea);
+                      btnEditar.style.display = '';
+                      btnSalvar.style.display = 'none';
+                      // Atualiza botão na tabela
+                      btnAbrirRevisao.dataset.revisao = textarea.value;
+                      // Atualiza cor do botão
+                      if (textarea.value) {
+                        btnAbrirRevisao.style.background = '#17a2b8';
+                        btnAbrirRevisao.style.color = '#fff';
+                      } else {
+                        btnAbrirRevisao.style.background = '#ffc107';
+                        btnAbrirRevisao.style.color = '#222';
+                      }
+                      // Atualiza no backend
+                      // Busca a linha da tabela
+                      const tds = btnAbrirRevisao.parentElement.parentElement.children;
+                      const dadosEnvio = {
+                        os: tds[0].innerText,
+                        abertura: tds[1].innerText,
+                        peca: tds[2].innerText,
+                        molde: tds[3].innerText,
+                        obs: '', // Não permite edição
+                        setor: tds[5].innerText,
+                        limite: tds[6].innerText,
+                        revisao: textarea.value,
+                        status: tds[8].innerText
+                      };
+                      fetch('/api/ferramentaria', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dadosEnvio)
+                      });
+                    };
+                  };
                   const btns = document.createElement('div');
                   btns.style.display = 'flex';
                   btns.style.justifyContent = 'flex-end';
+                  btns.appendChild(btnEditar);
+                  btns.appendChild(btnSalvar);
                   btns.appendChild(btnFecharRevisao);
                   box.appendChild(label);
                   box.appendChild(textoRevisao);
