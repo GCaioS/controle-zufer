@@ -218,7 +218,8 @@
             <th>Obs</th>
             <th>Setor Solicitante</th>
             <th>Data Limite Entrega</th>
-            <th>Status</th>
+              <th>Revisão</th>
+              <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -398,6 +399,7 @@
               `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:#ffc107;color:#222;font-weight:bold;cursor:pointer;'>Abrir</button></td>`,
               `<td>${dados.setor || ''}</td>`,
               `<td>${dados.limite || ''}</td>`,
+                `<td>${dados.revisao || ''}</td>`,
               `<td>${dados.status || ''}</td>`
             ].join('');
             tabela.appendChild(linha);
@@ -490,7 +492,8 @@
       const linha = document.createElement('tr');
       linha.id = 'linhaNova';
       const campos = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'status'];
-      campos.forEach((campo, idx) => {
+    const camposComRevisao = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'revisao', 'status'];
+    camposComRevisao.forEach((campo, idx) => {
         const td = document.createElement('td');
         if (campo === 'obs') {
           // Botão para abrir bloco de notas
@@ -588,19 +591,29 @@
               };
             }
           });
+  } else if (campo === 'limite') {
+        } else if (campo === 'revisao') {
+          let inputRevisao = document.createElement('input');
+          inputRevisao.type = 'text';
+          inputRevisao.style.width = '100%';
+          inputRevisao.style.padding = '6px';
+          inputRevisao.style.fontSize = '14px';
+          inputRevisao.style.boxSizing = 'border-box';
+          inputRevisao.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+          td.appendChild(inputRevisao);
         } else if (campo === 'limite') {
-          let input = document.createElement('input');
-          input.type = 'date';
-          input.style.width = '100%';
-          input.style.padding = '6px';
-          input.style.fontSize = '14px';
-          input.style.boxSizing = 'border-box';
-          input.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+          let inputLimite = document.createElement('input');
+          inputLimite.type = 'date';
+          inputLimite.style.width = '100%';
+          inputLimite.style.padding = '6px';
+          inputLimite.style.fontSize = '14px';
+          inputLimite.style.boxSizing = 'border-box';
+          inputLimite.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
           // Força abrir o calendário ao clicar
-          input.addEventListener('click', function(e) {
+          inputLimite.addEventListener('click', function(e) {
             this.showPicker && this.showPicker();
           });
-          td.appendChild(input);
+          td.appendChild(inputLimite);
         } else if (campo === 'setor') {
           const select = document.createElement('select');
           select.style.width = '100%';
@@ -634,77 +647,77 @@
           });
           td.appendChild(select);
         } else if (campo === 'abertura') {
-          let input = document.createElement('input');
-          input.type = 'date';
-          input.style.width = '100%';
-          input.style.padding = '6px';
-          input.style.fontSize = '14px';
-          input.style.boxSizing = 'border-box';
-          input.disabled = true;
+          let inputAbertura = document.createElement('input');
+          inputAbertura.type = 'date';
+          inputAbertura.style.width = '100%';
+          inputAbertura.style.padding = '6px';
+          inputAbertura.style.fontSize = '14px';
+          inputAbertura.style.boxSizing = 'border-box';
+          inputAbertura.disabled = true;
           const hoje = new Date();
-          input.value = hoje.toISOString().slice(0, 10);
-          td.appendChild(input);
+          inputAbertura.value = hoje.toISOString().slice(0, 10);
+          td.appendChild(inputAbertura);
         } else {
-          let input = document.createElement('input');
-          input.type = 'text';
-          input.style.width = '100%';
-          input.style.padding = '6px';
-          input.style.fontSize = '14px';
-          input.style.boxSizing = 'border-box';
-          input.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
-          td.appendChild(input);
+          let inputPadrao = document.createElement('input');
+          inputPadrao.type = 'text';
+          inputPadrao.style.width = '100%';
+          inputPadrao.style.padding = '6px';
+          inputPadrao.style.fontSize = '14px';
+          inputPadrao.style.boxSizing = 'border-box';
+          inputPadrao.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+          td.appendChild(inputPadrao);
         }
         linha.appendChild(td);
       });
       tabela.appendChild(linha);
-      // Adiciona botão salvar
-      const containerSalvar = document.getElementById('containerSalvar');
-      containerSalvar.innerHTML = '';
-      const btnSalvar = document.createElement('button');
-      btnSalvar.id = 'btnSalvar';
-      btnSalvar.textContent = 'Salvar';
-      btnSalvar.style.padding = '8px 18px';
-      btnSalvar.style.fontSize = '15px';
-      btnSalvar.style.border = 'none';
-      btnSalvar.style.borderRadius = '6px';
-      btnSalvar.style.background = '#007bff';
-      btnSalvar.style.color = '#fff';
-      btnSalvar.style.fontWeight = 'bold';
-      btnSalvar.style.cursor = 'pointer';
-      btnSalvar.style.transition = 'background 0.2s';
-      containerSalvar.appendChild(btnSalvar);
-      // Botão cancelar
-      const btnCancelar = document.createElement('button');
-      btnCancelar.id = 'btnCancelar';
-      btnCancelar.textContent = 'Cancelar';
-      btnCancelar.style.padding = '8px 18px';
-      btnCancelar.style.fontSize = '15px';
-      btnCancelar.style.border = 'none';
-      btnCancelar.style.borderRadius = '6px';
-      btnCancelar.style.background = '#dc3545';
-      btnCancelar.style.color = '#fff';
-      btnCancelar.style.fontWeight = 'bold';
-      btnCancelar.style.cursor = 'pointer';
-      btnCancelar.style.transition = 'background 0.2s';
-      btnCancelar.style.marginLeft = '10px';
-      containerSalvar.appendChild(btnCancelar);
+  // Adiciona botão salvar
+  const containerSalvar = document.getElementById('containerSalvar');
+  containerSalvar.innerHTML = '';
+  const btnSalvar = document.createElement('button');
+  btnSalvar.id = 'btnSalvar';
+  btnSalvar.textContent = 'Salvar';
+  btnSalvar.style.padding = '8px 18px';
+  btnSalvar.style.fontSize = '15px';
+  btnSalvar.style.border = 'none';
+  btnSalvar.style.borderRadius = '6px';
+  btnSalvar.style.background = '#007bff';
+  btnSalvar.style.color = '#fff';
+  btnSalvar.style.fontWeight = 'bold';
+  btnSalvar.style.cursor = 'pointer';
+  btnSalvar.style.transition = 'background 0.2s';
+  containerSalvar.appendChild(btnSalvar);
+  // Botão cancelar
+  const btnCancelar = document.createElement('button');
+  btnCancelar.id = 'btnCancelar';
+  btnCancelar.textContent = 'Cancelar';
+  btnCancelar.style.padding = '8px 18px';
+  btnCancelar.style.fontSize = '15px';
+  btnCancelar.style.border = 'none';
+  btnCancelar.style.borderRadius = '6px';
+  btnCancelar.style.background = '#dc3545';
+  btnCancelar.style.color = '#fff';
+  btnCancelar.style.fontWeight = 'bold';
+  btnCancelar.style.cursor = 'pointer';
+  btnCancelar.style.transition = 'background 0.2s';
+  btnCancelar.style.marginLeft = '10px';
+  containerSalvar.appendChild(btnCancelar);
       btnSalvar.addEventListener('click', function() {
         // Captura os valores dos campos
-        const campos = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'status'];
+        const camposComRevisao = ['os', 'abertura', 'peca', 'molde', 'obs', 'setor', 'limite', 'revisao', 'status'];
         const dados = {};
         linha.childNodes.forEach((td, idx) => {
-          if (campos[idx] === 'obs') {
+          if (camposComRevisao[idx] === 'obs') {
             const btnObs = td.querySelector('button');
-            dados[campos[idx]] = btnObs ? (btnObs.dataset.obs || '') : '';
-          } else if (campos[idx] === 'setor' || campos[idx] === 'status') {
+            dados[camposComRevisao[idx]] = btnObs ? (btnObs.dataset.obs || '') : '';
+          } else if (camposComRevisao[idx] === 'setor' || camposComRevisao[idx] === 'status') {
             const select = td.querySelector('select');
-            dados[campos[idx]] = select ? select.value : '';
-          } else if (campos[idx] === 'limite' || campos[idx] === 'abertura') {
+            dados[camposComRevisao[idx]] = select ? select.value : '';
+          } else if (camposComRevisao[idx] === 'limite' || camposComRevisao[idx] === 'abertura') {
             const input = td.querySelector('input[type="date"]');
-            dados[campos[idx]] = input ? input.value : '';
+            dados[camposComRevisao[idx]] = input ? input.value : '';
           } else {
             const input = td.querySelector('input');
-            dados[campos[idx]] = input ? input.value : '';
+            dados[camposComRevisao[idx]] = input ? input.value : '';
           }
         });
         // Envia os dados para o backend
@@ -721,7 +734,7 @@
           alert('Erro ao salvar!');
         });
         // Substitui a linha de inputs por uma linha de texto
-        linha.innerHTML = campos.map((campo, idx) => {
+        linha.innerHTML = camposComRevisao.map((campo, idx) => {
           if (campo === 'obs') {
             return `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:#ffc107;color:#222;font-weight:bold;cursor:pointer;'>Abrir</button></td>`;
           }
@@ -770,7 +783,7 @@
               textoObs.style.border = '1px solid #ccc';
               textoObs.style.background = '#f8f9fa';
               textoObs.style.whiteSpace = 'pre-wrap';
-              textoObs.textContent = valores[4];
+              textoObs.textContent = dados.obs || '';
               const btnFecharObs = document.createElement('button');
               btnFecharObs.textContent = 'Fechar';
               btnFecharObs.style.padding = '8px 18px';
