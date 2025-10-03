@@ -254,6 +254,7 @@
     .classe-tipo-table th, .classe-tipo-table td { text-align: left; }
     .tick { width: 16px; height: 16px; display: inline-block; border: 1px solid #000; }
     .obs { border: 1px solid #000; height: 280px; margin-top: 12px; padding: 8px; font-size: 13px; }
+    .descricao { border: 1px solid #000; height: 100px; margin-top: 12px; padding: 8px; font-size: 13px; }
     .assinaturas { margin-top: 12px; width: 100%; }
     .assinaturas td { height: 36px; padding: 8px; }
     .data-criacao-block { width: 30%; float: right; margin-top: 12px; }
@@ -273,7 +274,6 @@
     <tr>
       <td colspan="2">Solicitante: ${dados[5] || ''}</td>
       <td style="width: 25%;">Produto: ${dados[2] || ''}</td>
-      <td style="width: 35%;">Descrição:</td>
       <td></td>
     </tr>
   </table>
@@ -333,10 +333,13 @@
     </tr>
   </table>
 
+  <div class="descricao">
+    <b>Descrição:</b><br><br>${dados[4] || ''}
+  </div>        
+
   <!-- OBSERVAÇÃO -->
   <div class="obs">
     <b>Observação:</b><br><br>
-    ${dados[4] || ''}
   </div>
 
   <!-- RODAPÉ: Molde / Responsável / Início / Fim -->
@@ -351,13 +354,7 @@
       <td style="width: 25%;">Fim da Manutenção: ___/___/____</td>
     </tr>
   </table>
-  <table>
-    <tr>
-      <td style="width: 80px; text-align:center; vertical-align:middle;">
-        <img src='./FOTO FERRAMENTARIA.png' alt='Logo' style='max-width:300px; display:block; margin:auto;'>
-      </td>
-    </tr>
-  </table>
+    <img src='./FOTO FERRAMENTARIA.png' alt='Logo' style='max-width:200px; display:block; margin-top:24px; margin:auto;'>
 </body>
 </html>
         `;
