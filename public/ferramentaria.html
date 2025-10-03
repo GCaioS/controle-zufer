@@ -268,11 +268,11 @@
         <img src='./logo.png' alt='Logo' style='max-width:70px; max-height:32px; display:block; margin:auto;'>
       </td>
       <td class="titulo" colspan="3">Ordem de Serviço Manutenção</td>
-      <td style="width: 80px;">OS:</td>
+      <td style="width: 80px;">OS: ${dados[0] || ''}</td>
     </tr>
     <tr>
-      <td colspan="2">Solicitante:</td>
-      <td style="width: 25%;">Código Produto:</td>
+      <td colspan="2">Solicitante: ${dados[5] || ''}</td>
+      <td style="width: 25%;">Produto: ${dados[2] || ''}</td>
       <td style="width: 35%;">Descrição:</td>
       <td></td>
     </tr>
@@ -327,6 +327,12 @@
   </div>
   <div class="clear"></div>
 
+  <table>
+    <tr>
+      <td style="width: 25%;">Molde: ${dados[3] || ''}</td>
+    </tr>
+  </table>
+
   <!-- OBSERVAÇÃO -->
   <div class="obs">
     <b>Observação:</b><br><br>
@@ -336,7 +342,6 @@
   <!-- RODAPÉ: Molde / Responsável / Início / Fim -->
   <table class="assinaturas">
     <tr>
-      <td style="width: 25%;">Molde: ${dados[3] || ''}</td>
       <td style="width: 30%;">Responsável: __________________</td>
       <td style="width: 20%;">Início da Manutenção: ___/___/____</td>
       <td style="width: 25%;">Fim da Manutenção: ___/___/____</td>
