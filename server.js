@@ -43,6 +43,28 @@ app.post('/api/ferramentaria', (req, res) => {
   fs.writeFileSync(filePath, JSON.stringify(registros, null, 2));
   res.status(200).json({ message: 'Salvo com sucesso!' });
 });
+// Endpoint para atualizar registro da ferramentaria
+app.put('/api/ferramentaria', (req, res) => {
+  const dadosAtualizados = req.body;
+  const filePath = path.join(__dirname, 'data', 'ferramentaria.json');
+  let registros = [];
+  if (fs.existsSync(filePath)) {
+    try {
+      registros = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (e) {
+      registros = [];
+    }
+  }
+  // Atualiza o registro pelo número da OS
+  const idx = registros.findIndex(r => r.os === dadosAtualizados.os);
+  if (idx !== -1) {
+    registros[idx] = { ...registros[idx], ...dadosAtualizados };
+    fs.writeFileSync(filePath, JSON.stringify(registros, null, 2));
+    res.status(200).json({ message: 'Registro atualizado com sucesso!' });
+  } else {
+    res.status(404).json({ error: 'Registro não encontrado' });
+  }
+});
 
 app.get('/cards/:boardId', async (req, res) => {
   const boardId = req.params.boardId;
