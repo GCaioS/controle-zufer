@@ -332,11 +332,21 @@
   <div class="main-content" id="mainContent">
   <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 10px; justify-content: space-between; position: relative;">
     <img src="logo.png" alt="Logo" style="height: 58px; margin-right: 18px; margin-left: 0;" />
+    <button id="btnExportExcel" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer;">Exportar para Excel (teste)</button>
   </div>
   <h2 style="margin-top: 30px">Sequência de Máquinas</h2>
   <div id="dashboard" style="margin-top: 30px"></div>
 
   <script>
+    // Botão de teste para exportar para Excel
+    document.addEventListener('DOMContentLoaded', function() {
+      const btnExport = document.getElementById('btnExportExcel');
+      if (btnExport) {
+        btnExport.addEventListener('click', function() {
+          alert('Exportação para Excel será implementada aqui!');
+        });
+      }
+    });
     const labelColors = {
       green: '#61bd4f', yellow: '#f2d600', orange: '#ff9f1a', red: '#eb5a46',
       purple: '#c377e0', blue: '#0079bf', sky: '#00c2e0', lime: '#51e898',
