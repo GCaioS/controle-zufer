@@ -918,6 +918,11 @@
             const textoBtn = 'Ver';
             return `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:${corObs};color:${corTexto};font-weight:bold;cursor:pointer;'>${textoBtn}</button></td>`;
           }
+          if (campo === 'revisao') {
+            const corRevisao = dados.revisao ? '#17a2b8' : '#ffc107';
+            const corTexto = dados.revisao ? '#fff' : '#222';
+            return `<td><button class='btnAbrirRevisao' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:${corRevisao};color:${corTexto};font-weight:bold;cursor:pointer;'>Abrir</button></td>`;
+          }
           return `<td>${dados[campo]}</td>`;
         }).join('');
         linha.id = '';
