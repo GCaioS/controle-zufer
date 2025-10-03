@@ -396,7 +396,7 @@
               `<td>${dados.abertura || ''}</td>`,
               `<td>${dados.peca || ''}</td>`,
               `<td>${dados.molde || ''}</td>`,
-              `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:#ffc107;color:#222;font-weight:bold;cursor:pointer;'>Ver</button></td>`,
+              `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background: #17a2b8;color:#222;font-weight:bold;cursor:pointer;'>Ver</button></td>`,
               `<td>${dados.setor || ''}</td>`,
               `<td>${dados.limite || ''}</td>`,
                 `<td>${dados.revisao || ''}</td>`,
@@ -587,6 +587,13 @@
               btnSalvarObs.onclick = () => {
                 btnObs.dataset.obs = textarea.value;
                 btnObs.textContent = textarea.value ? 'Ok' : 'Adicionar Obs';
+                if (textarea.value) {
+                  btnObs.style.background = '#17a2b8';
+                  btnObs.style.color = '#fff';
+                } else {
+                  btnObs.style.background = '#ffc107';
+                  btnObs.style.color = '#222';
+                }
                 modal.remove();
               };
             }
@@ -823,7 +830,11 @@
         // Substitui a linha de inputs por uma linha de texto
         linha.innerHTML = camposComRevisao.map((campo, idx) => {
           if (campo === 'obs') {
-            return `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:#ffc107;color:#222;font-weight:bold;cursor:pointer;'>Ver</button></td>`;
+            // Se o campo obs estiver preenchido, aplica azul, senão amarelo
+            const corObs = dados.obs ? '#17a2b8' : '#ffc107';
+            const corTexto = dados.obs ? '#fff' : '#222';
+            const textoBtn = 'Ver';
+            return `<td><button class='btnAbrirObs' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:${corObs};color:${corTexto};font-weight:bold;cursor:pointer;'>${textoBtn}</button></td>`;
           }
           return `<td>${dados[campo]}</td>`;
         }).join('');
