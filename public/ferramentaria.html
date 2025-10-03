@@ -207,7 +207,6 @@
   <button id="btnImprimir" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s;">Imprimir</button>
     </div>
     <div style="overflow-x:auto; margin-top: 24px;">
-  <button id="btnImprimirOrdem" style="padding: 8px 18px; font-size: 15px; border: none; border-radius: 6px; background: #ffc107; color: #222; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-bottom: 12px;">Imprimir Ordem</button>
   <table class="ferramentaria-table" id="tabelaFerramentaria">
         <thead>
           <tr>
@@ -232,7 +231,7 @@
   <script>
     // Botão imprimir ordem de produção (primeira linha)
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('btnImprimirOrdem').addEventListener('click', function() {
+      document.getElementById('btnImprimir').addEventListener('click', function() {
         const tabela = document.getElementById('tabelaFerramentaria');
         const primeiraLinha = tabela.querySelector('tbody tr');
         if (!primeiraLinha) {
@@ -365,21 +364,6 @@
         setTimeout(function() {
           win.print();
         }, 1000);
-      });
-    });
-    // Botão imprimir: imprime apenas a tabela de ferramentaria
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('btnImprimir').addEventListener('click', function() {
-        const tabela = document.getElementById('tabelaFerramentaria');
-        const win = window.open('', '', 'width=900,height=600');
-        win.document.write('<html><head><title>Impressão Ferramentaria</title>');
-        win.document.write('<style>body{font-family:Arial,sans-serif;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px;text-align:center;}th{background:#007bff;color:#fff;}</style>');
-        win.document.write('</head><body >');
-        win.document.write('<h2>Ferramentaria</h2>');
-        win.document.write(tabela.outerHTML);
-        win.document.write('</body></html>');
-        win.document.close();
-        win.print();
       });
     });
     // Buscar e exibir registros salvos ao carregar a página
@@ -575,6 +559,8 @@
                       btnSalvar.style.display = 'none';
                       // Atualiza botão na tabela
                       btnAbrirRevisao.dataset.revisao = textarea.value;
+                      // Atualiza variável local de revisão
+                      dados.revisao = textarea.value;
                       // Atualiza cor do botão
                       if (textarea.value) {
                         btnAbrirRevisao.style.background = '#17a2b8';
