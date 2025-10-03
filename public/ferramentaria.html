@@ -599,6 +599,18 @@
             }
           });
   } else if (campo === 'limite') {
+      let inputLimite = document.createElement('input');
+      inputLimite.type = 'date';
+      inputLimite.style.width = '100%';
+      inputLimite.style.padding = '6px';
+      inputLimite.style.fontSize = '14px';
+      inputLimite.style.boxSizing = 'border-box';
+      inputLimite.placeholder = document.querySelectorAll('.ferramentaria-table th')[idx].textContent;
+      // Força abrir o calendário ao clicar
+      inputLimite.addEventListener('click', function(e) {
+        this.showPicker && this.showPicker();
+      });
+      td.appendChild(inputLimite);
         } else if (campo === 'revisao') {
           // Botão para abrir bloco de revisão
           const btnRevisao = document.createElement('button');
