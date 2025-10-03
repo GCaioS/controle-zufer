@@ -351,13 +351,22 @@
       <td style="width: 25%;">Fim da Manutenção: ___/___/____</td>
     </tr>
   </table>
+  <table>
+    <tr>
+      <td style="width: 80px; text-align:center; vertical-align:middle;">
+        <img src='./FOTO FERRAMENTARIA.png' alt='Logo' style='max-width:300px; display:block; margin:auto;'>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
         `;
         const win = window.open('', '', 'width=900,height=700');
         win.document.write(html);
         win.document.close();
-        win.print();
+        setTimeout(function() {
+          win.print();
+        }, 1000);
       });
     });
     // Botão imprimir: imprime apenas a tabela de ferramentaria
