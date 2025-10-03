@@ -583,8 +583,10 @@
                         btnAbrirRevisao.style.background = '#ffc107';
                         btnAbrirRevisao.style.color = '#222';
                       }
+                      // Atualiza célula da tabela imediatamente
+                      const tdRevisao = btnAbrirRevisao.parentElement;
+                      tdRevisao.setAttribute('data-revisao', textarea.value);
                       // Atualiza no backend
-                      // Busca a linha da tabela
                       const tds = btnAbrirRevisao.parentElement.parentElement.children;
                       const dadosEnvio = {
                         os: tds[0].innerText,
