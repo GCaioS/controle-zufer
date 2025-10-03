@@ -233,12 +233,25 @@
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('btnImprimir').addEventListener('click', function() {
         const tabela = document.getElementById('tabelaFerramentaria');
-        const primeiraLinha = tabela.querySelector('tbody tr');
-        if (!primeiraLinha) {
-          alert('Nenhum registro para imprimir!');
+        const numeroOS = prompt('Digite o número da OS que deseja imprimir:');
+        if (!numeroOS) {
+          alert('Número da OS não informado!');
           return;
         }
-        const dados = Array.from(primeiraLinha.children).map(td => td.innerText);
+        // Busca a linha correspondente à OS informada
+        const linhas = tabela.querySelectorAll('tbody tr');
+        let linhaEncontrada = null;
+        linhas.forEach(linha => {
+          const valorOS = linha.children[0]?.innerText?.trim();
+          if (valorOS === numeroOS.trim()) {
+            linhaEncontrada = linha;
+          }
+        });
+        if (!linhaEncontrada) {
+          alert('OS não encontrada!');
+          return;
+        }
+        const dados = Array.from(linhaEncontrada.children).map(td => td.innerText);
         // Novo layout fornecido pelo usuário
         const html = `
 <html>
