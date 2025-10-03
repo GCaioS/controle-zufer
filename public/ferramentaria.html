@@ -375,6 +375,18 @@
           tabela.innerHTML = '';
           registros.forEach(dados => {
             const linha = document.createElement('tr');
+            // Personalização do status
+            let statusStyle = '';
+            let statusText = dados.status || '';
+            if (statusText === 'Liberada') {
+              statusStyle = 'background:#007bff;color:#fff;font-weight:bold;border-radius:6px;';
+            } else if (statusText === 'Em Andamento') {
+              statusStyle = 'background:#ffc107;color:#222;font-weight:bold;border-radius:6px;';
+            } else if (statusText === 'Concluído') {
+              statusStyle = 'background:#28a745;color:#fff;font-weight:bold;border-radius:6px;';
+            } else {
+              statusStyle = 'background:#e0e0e0;color:#222;border-radius:6px;';
+            }
             linha.innerHTML = [
               `<td>${dados.os || ''}</td>`,
               `<td>${dados.abertura || ''}</td>`,
@@ -384,7 +396,7 @@
               `<td>${dados.setor || ''}</td>`,
               `<td>${dados.limite || ''}</td>`,
                 `<td><button class='btnAbrirRevisao' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:${dados.revisao ? '#17a2b8' : '#ffc107'};color:${dados.revisao ? '#fff' : '#222'};font-weight:bold;cursor:pointer;'>Abrir</button></td>`,
-              `<td>${dados.status || ''}</td>`
+              `<td style='${statusStyle}'>${statusText}</td>`
             ].join('');
             tabela.appendChild(linha);
             // Evento para abrir observação
@@ -992,6 +1004,20 @@
             const corRevisao = dados.revisao ? '#17a2b8' : '#ffc107';
             const corTexto = dados.revisao ? '#fff' : '#222';
             return `<td><button class='btnAbrirRevisao' style='padding:6px 12px;font-size:14px;border:none;border-radius:6px;background:${corRevisao};color:${corTexto};font-weight:bold;cursor:pointer;'>Abrir</button></td>`;
+          }
+          if (campo === 'status') {
+            let statusStyle = '';
+            let statusText = dados.status || '';
+            if (statusText === 'Liberada') {
+              statusStyle = 'background:#28a745;color:#fff;font-weight:bold;border-radius:6px;';
+            } else if (statusText === 'Em Andamento') {
+              statusStyle = 'background:#ffc107;color:#222;font-weight:bold;border-radius:6px;';
+            } else if (statusText === 'Concluído') {
+              statusStyle = 'background:#007bff;color:#fff;font-weight:bold;border-radius:6px;';
+            } else {
+              statusStyle = 'background:#e0e0e0;color:#222;border-radius:6px;';
+            }
+            return `<td style='${statusStyle}'>${statusText}</td>`;
           }
           return `<td>${dados[campo]}</td>`;
         }).join('');
